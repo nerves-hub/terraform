@@ -5,7 +5,7 @@ locals {
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "nerveshub-${terraform.workspace}"
+  name = "nerves-hub-${terraform.workspace}"
 
   cidr = "10.${local.subnet}.0.0/16"
 
@@ -22,22 +22,7 @@ module "vpc" {
   enable_dns_hostnames         = true
   enable_dns_support           = true
   tags = {
-    Owner       = "nerveshub"
+    Owner       = "nerves-hub"
     Environment = "${terraform.workspace}"
   }
-}
-
-output "vpc_id" {
-  description = "The ID of the VPC"
-  value       = "\"${module.vpc.vpc_id}\""
-}
-
-output "private_subnet_ids" {
-  description = "List of IDs of private subnets"
-  value       = module.vpc.private_subnets
-}
-
-output "public_subnet_ids" {
-  description = "List of IDs of public subnets"
-  value       = module.vpc.public_subnets
 }

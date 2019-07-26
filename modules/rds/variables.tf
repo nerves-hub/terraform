@@ -1,3 +1,10 @@
+variable "name" {
+
+}
+
+variable "identifier" {
+
+}
 
 variable "username" {
 

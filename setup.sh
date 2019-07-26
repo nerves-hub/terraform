@@ -13,4 +13,5 @@ terraform init setup
 terraform apply setup
 
 # migrate local state to the remote with the s3 bucket and dynamodb table
-terraform init base
+terraform init -backend-config=terraform.tfvars base
+rm -rf terraform.tfstate.d

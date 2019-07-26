@@ -1,12 +1,31 @@
+## AWS
 aws_region = "us-east-1"
-aws_profile = "nerveshub"
+aws_profile = "nerves-hub"
 
-bucket = "nerveshub-terraform-state"
+## Terraform
+bucket = "nerves-hub-terraform-state"
 dynamodb_table = "terraform-state-lock"
 key = "terraform.tfstate"
 operators = [
   "myname"
 ]
 
+## Database
 db_username = "nerveshub"
 db_password = "123456"
+#db_allocated_storage = 20
+#db_instance_class = "db.t2.small"
+#db_engine_version = "11.4"
+
+## Erlang
+erl_cookie = "123456"
+
+## Rollbar
+rollbar_access_token_ca = "123456"
+
+## Applications
+#ca_service_desired_count = 1
+#ca_image = "nerveshub/nerves_hub_ca:latest"
+
+## Logs
+#log_retention = 90 # Log retention for staging is 1

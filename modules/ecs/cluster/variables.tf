@@ -17,3 +17,7 @@ variable "aws_private_subnet_ids" {
 variable "aws_public_subnet_ids" {
   description = "Subnet ids"
 }
+
+variable "log_retention" {
+  description = "Cloud watch log retention days"
+}

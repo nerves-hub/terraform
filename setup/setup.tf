@@ -13,19 +13,9 @@ module "backend" {
 
   bootstrap      = terraform.workspace == "base" ? 1 : 0
   operators      = var.operators
-  bucket         = var.bucket
+  bucket         = "${var.bucket_prefix}-terraform-state"
   dynamodb_table = var.dynamodb_table
   key            = var.key
 }
 
-data "terraform_remote_state" "base" {
-  backend   = "s3"
-  workspace = terraform.workspace
-
-  config = {
-    bucket         = var.bucket
-    key            = var.key
-    region         = var.region
-    dynamodb_table = var.dynamodb_table
-  }
-}
+data "aws_caller_identity" "current" {}

@@ -1,12 +1,22 @@
-module "rds" {
-  source = "../modules/rds"
+  data "aws_subnet_ids" "db_subnet" {
+  vpc_id = module.vpc.vpc_id
+  filter {
+    name   = "tag:Name"
+    values = ["nerves-hub-${terraform.workspace}-db-*"]
+  }
+}
 
-  username               = var.db_username
-  password               = var.db_password
-  instance_class         = var.db_instance_class
-  allocated_storage      = var.db_allocated_storage
-  subnet_group           = "nerveshub-${terraform.workspace}"
-  engine_version         = var.db_engine_version
-  vpc_id                 = module.vpc.vpc_id
-  kms_key                = aws_kms_key.db_enc_key.id
+resource "aws_db_subnet_group" "db" {
+  name       = "db"
+  subnet_ids = data.aws_subnet_ids.db_subnet.ids
+
+  tags = {
+    Name = "DB subnet group"
+  }
+  depends_on = [
+    data.aws_subnet_ids.db_subnet
+  ]
+  lifecycle {
+    ignore_changes = [subnet_ids]
+  }
 }
