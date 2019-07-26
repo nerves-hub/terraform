@@ -1,0 +1,12 @@
+aws_region = "us-east-1"
+aws_profile = "nerveshub"
+
+bucket = "nerveshub-terraform-state"
+dynamodb_table = "terraform-state-lock"
+key = "terraform.tfstate"
+operators = [
+  "myname"
+]
+
+db_username = "nerveshub"
+db_password = "123456"
