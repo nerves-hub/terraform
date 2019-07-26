@@ -266,6 +266,31 @@ resource "aws_iam_role_policy_attachment" "role_policy_attach" {
   policy_arn = aws_iam_policy.ca_task_policy.arn
 }
 
+# Service discovery
+resource "aws_service_discovery_private_dns_namespace" "local_dns_namespace" {
+  name        = "${terraform.workspace}.nerves-hub.local"
+  description = "${terraform.workspace}"
+  vpc         = module.vpc.vpc_id
+}
+
+resource "aws_service_discovery_service" "ca_service_discovery" {
+  name = "ca"
+
+  dns_config {
+    namespace_id = "${aws_service_discovery_private_dns_namespace.local_dns_namespace.id}"
+
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+
+    routing_policy = "MULTIVALUE"
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
+}
 
 # ECS
 resource "aws_ecs_task_definition" "ca_task_definition" {
@@ -327,14 +352,23 @@ resource "aws_ecs_service" "ca_ecs_service" {
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
-  launch_type                        = "FARGATE"
+  launch_type = "FARGATE"
+
   network_configuration {
     security_groups = [aws_security_group.ca_security_group.id]
     subnets         = module.vpc.private_subnets
+  }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.ca_service_discovery.arn
   }
 
   # After the first setup, we want to ignore this so deploys aren't reverted
   lifecycle {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
+
+  depends_on      = [
+    aws_iam_role.ca_task_role
+  ]
 }
