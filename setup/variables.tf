@@ -104,3 +104,13 @@ variable "www_service_desired_count" {
 variable "www_live_view_signing_salt" {
   description = "The signing salt to use for Phoenix LiveView"
 }
+
+variable "device_image" {
+  description = "The docker image of the nerves_hub_device app"
+  default = "nerveshub/nerves_hub_device:latest"
+}
+
+variable "device_service_desired_count" {
+  description = "The number of NervesHubDevice containers to run"
+  default = "1"
+}

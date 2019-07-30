@@ -1,190 +1,160 @@
-# nerves_hub_www
+# nerves_hub_device
 
 locals {
-  www_app_name = "nerves_hub_www"
+  device_app_name = "nerves_hub_device"
 }
 
 # Load Balancer
-resource "aws_lb_target_group" "www_lb_tg" {
-  name     = "nerves-hub-${terraform.workspace}-www-tg"
-  port     = 80
-  protocol = "HTTP"
+resource "aws_lb_target_group" "device_lb_tg" {
+  name     = "nerves-hub-${terraform.workspace}-device-tg"
+  port     = 443
+  protocol = "TCP"
   target_type = "ip"
   vpc_id   = module.vpc.vpc_id
 
   health_check {
-    interval = 20
-    timeout = 10
     healthy_threshold = 3
-    unhealthy_threshold = 3
-    matcher = "200-399"
   }
 }
 
-resource "aws_lb" "www_lb" {
-  name               = "nerves-hub-${terraform.workspace}-www-lb"
+resource "aws_lb" "device_lb" {
+  name               = "nerves-hub-${terraform.workspace}-device-lb"
   internal           = false
-  load_balancer_type = "application"
-  security_groups    = [module.ecs_cluster.lb_security_group_id]
+  load_balancer_type = "network"
   subnets            = module.vpc.public_subnets
   tags = {
     Environment = terraform.workspace
   }
 }
 
-resource "aws_lb_listener" "www_lb_listener" {
-  load_balancer_arn = "${aws_lb.www_lb.arn}"
-  port              = "80"
-  protocol          = "HTTP"
+resource "aws_lb_listener" "device_lb_listener" {
+  load_balancer_arn = "${aws_lb.device_lb.arn}"
+  port              = "443"
+  protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.www_lb_tg.arn}"
+    target_group_arn = "${aws_lb_target_group.device_lb_tg.arn}"
   }
 }
 
-resource "aws_route53_record" "www_dns_record" {
+resource "aws_route53_record" "device_dns_record" {
   zone_id = data.aws_route53_zone.dns_zone.zone_id
-  name    = terraform.workspace == "production" ? "www.${var.domain}." : "www.${terraform.workspace}.${var.domain}."
+  name    = terraform.workspace == "production" ? "device.${var.domain}." : "device.${terraform.workspace}.${var.domain}."
   type    = "A"
 
   alias {
-    name                   = aws_lb.www_lb.dns_name
-    zone_id                = aws_lb.www_lb.zone_id
+    name                   = aws_lb.device_lb.dns_name
+    zone_id                = aws_lb.device_lb.zone_id
     evaluate_target_health = false
   }
 
   depends_on = [
-    aws_lb.www_lb
+    aws_lb.device_lb
   ]
 }
 
-data "aws_acm_certificate" "www_certificate" {
-  domain   = "www.${terraform.workspace}.${var.domain}"
-  statuses = ["ISSUED"]
-}
-
-resource "aws_lb_listener" "www_ssl_lb_listener" {
-  load_balancer_arn = aws_lb.www_lb.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.www_certificate.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = "${aws_lb_target_group.www_lb_tg.arn}"
-  }
-}
-
 # SSM
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_db_url" {
-  name      = "/nerves_hub_www/${terraform.workspace}/DATABASE_URL"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_db_url" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/DATABASE_URL"
   type      = "SecureString"
   value     = "postgres://${var.db_username}:${var.db_password}@${module.web_db.endpoint}/${var.web_db_name}"
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_live_view_signing_salt" {
-  name      = "/nerves_hub_www/${terraform.workspace}/LIVE_VIEW_SIGNING_SALT"
-  type      = "SecureString"
-  value     = var.www_live_view_signing_salt
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_erl_cookie" {
-  name      = "/nerves_hub_www/${terraform.workspace}/ERL_COOKIE"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_erl_cookie" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/ERL_COOKIE"
   type      = "SecureString"
   value     = var.erl_cookie
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_ssl_bucket" {
-  name      = "/nerves_hub_www/${terraform.workspace}/S3_SSL_BUCKET"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_s3_ssl_bucket" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/S3_SSL_BUCKET"
   type      = "String"
   value     = aws_s3_bucket.ca_application_data.bucket
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_app_name" {
-  name      = "/nerves_hub_www/${terraform.workspace}/APP_NAME"
-  type      = "String"
-  value     = "nerves_hub_www"
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_cluster" {
-  name      = "/nerves_hub_www/${terraform.workspace}/CLUSTER"
-  type      = "String"
-  value     = terraform.workspace == "production" ? "nerves-hub" : "nerves-hub-${terraform.workspace}"
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_aws_region" {
-  name      = "/nerves_hub_www/${terraform.workspace}/AWS_REGION"
-  type      = "String"
-  value     = var.region
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_port" {
-  name      = "/nerves_hub_www/${terraform.workspace}/PORT"
-  type      = "String"
-  value     = 80
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_host" {
-  name      = "/nerves_hub_www/${terraform.workspace}/HOST"
-  type      = "String"
-  value     = "www.${terraform.workspace}.${var.domain}"
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_bucket_name" {
-  name      = "/nerves_hub_www/${terraform.workspace}/S3_BUCKET_NAME"
-  type      = "String"
-  value     = aws_s3_bucket.web_application_data.bucket
-  overwrite = true
-}
-
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_log_bucket_name" {
-  name      = "/nerves_hub_www/${terraform.workspace}/S3_LOG_BUCKET_NAME"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_s3_log_bucket_name" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/S3_LOG_BUCKET_NAME"
   type      = "String"
   value     = aws_s3_bucket.web_firmware_transfer_logs.bucket
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_secret_key_base" {
-  name      = "/nerves_hub_www/${terraform.workspace}/SECRET_KEY_BASE"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_app_name" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/APP_NAME"
+  type      = "String"
+  value     = "${local.device_app_name}"
+  overwrite = true
+}
+
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_cluster" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/CLUSTER"
+  type      = "String"
+  value     = terraform.workspace == "production" ? "nerves-hub" : "nerves-hub-${terraform.workspace}"
+  overwrite = true
+}
+
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_aws_region" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/AWS_REGION"
+  type      = "String"
+  value     = var.region
+  overwrite = true
+}
+
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_port" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/PORT"
+  type      = "String"
+  value     = 80
+  overwrite = true
+}
+
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_host" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/HOST"
+  type      = "String"
+  value     = "device.${terraform.workspace}.${var.domain}"
+  overwrite = true
+}
+
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_s3_bucket_name" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/S3_BUCKET_NAME"
+  type      = "String"
+  value     = aws_s3_bucket.web_application_data.bucket
+  overwrite = true
+}
+
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_secret_key_base" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/SECRET_KEY_BASE"
   type      = "SecureString"
   value     = var.web_secret_key_base
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_port" {
-  name      = "/nerves_hub_www/${terraform.workspace}/SES_PORT"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_ses_port" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/SES_PORT"
   type      = "String"
   value     = "587"
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_server" {
-  name      = "/nerves_hub_www/${terraform.workspace}/SES_SERVER"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_ses_server" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/SES_SERVER"
   type      = "String"
   value     = "email-smtp.${var.region}.amazonaws.com"
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_smtp_username" {
-  name      = "/nerves_hub_www/${terraform.workspace}/SMTP_USERNAME"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_smtp_username" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/SMTP_USERNAME"
   type      = "SecureString"
   value     = var.web_smtp_password
   overwrite = true
 }
 
-resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_smtp_password" {
-  name      = "/nerves_hub_www/${terraform.workspace}/SMTP_PASSWORD"
+resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_smtp_password" {
+  name      = "/${local.device_app_name}/${terraform.workspace}/SMTP_PASSWORD"
   type      = "SecureString"
   value     = var.web_smtp_username
   overwrite = true
@@ -192,8 +162,8 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_smtp_password" {
 
 # Roles
 ## Task role
-resource "aws_iam_role" "www_task_role" {
-  name = "nerves-hub-${terraform.workspace}-www-role"
+resource "aws_iam_role" "device_task_role" {
+  name = "nerves-hub-${terraform.workspace}-device-role"
 
   assume_role_policy = <<EOF
 {
@@ -213,7 +183,7 @@ EOF
 
 }
 
-data "aws_iam_policy_document" "www_iam_policy" {
+data "aws_iam_policy_document" "device_iam_policy" {
   statement {
     sid = "1"
 
@@ -233,7 +203,7 @@ data "aws_iam_policy_document" "www_iam_policy" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/nerves_hub_www/${terraform.workspace}*"
+      "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/${local.device_app_name}/${terraform.workspace}*"
     ]
   }
 
@@ -335,21 +305,20 @@ data "aws_iam_policy_document" "www_iam_policy" {
   }
 }
 
-
-resource "aws_iam_policy" "www_task_policy" {
-  name = "nerves-hub-${terraform.workspace}-www-task-policy"
-  policy = data.aws_iam_policy_document.www_iam_policy.json
+resource "aws_iam_policy" "device_task_policy" {
+  name = "nerves-hub-${terraform.workspace}-device-task-policy"
+  policy = data.aws_iam_policy_document.device_iam_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "www_role_policy_attach" {
-  role = aws_iam_role.www_task_role.name
-  policy_arn = aws_iam_policy.www_task_policy.arn
+resource "aws_iam_role_policy_attachment" "device_role_policy_attach" {
+  role = aws_iam_role.device_task_role.name
+  policy_arn = aws_iam_policy.device_task_policy.arn
 }
 
 # ECS
-resource "aws_ecs_task_definition" "www_task_definition" {
-  family = "nerves-hub-${terraform.workspace}-www"
-  task_role_arn = aws_iam_role.www_task_role.arn
+resource "aws_ecs_task_definition" "device_task_definition" {
+  family = "nerves-hub-${terraform.workspace}-device"
+  task_role_arn = aws_iam_role.device_task_role.arn
   execution_role_arn = aws_iam_role.ecs_tasks_execution_role.arn
 
   network_mode = "awsvpc"
@@ -362,16 +331,16 @@ resource "aws_ecs_task_definition" "www_task_definition" {
      {
        "portMappings": [
          {
-           "hostPort": 80,
+           "hostPort": 443,
            "protocol": "tcp",
-           "containerPort": 80
+           "containerPort": 443
          }
        ],
        "networkMode": "awsvpc",
-       "image": "${var.www_image}",
+       "image": "${var.device_image}",
        "essential": true,
        "privileged": false,
-       "name": "nerves_hub_www",
+       "name": "${local.device_app_name}",
        "environment": [
          {
            "name": "ENVIRONMENT",
@@ -379,7 +348,7 @@ resource "aws_ecs_task_definition" "www_task_definition" {
          },
          {
            "name": "APP_NAME",
-           "value": "nerves_hub_www"
+           "value": "${local.device_app_name}"
          }
        ],
        "logConfiguration": {
@@ -387,7 +356,7 @@ resource "aws_ecs_task_definition" "www_task_definition" {
          "options": {
            "awslogs-region": "${var.region}",
            "awslogs-group": "${module.ecs_cluster.log_group}",
-           "awslogs-stream-prefix": "nerves_hub_www"
+           "awslogs-stream-prefix": "${local.device_app_name}"
          }
        }
      }
@@ -397,27 +366,27 @@ DEFINITION
 
 }
 
-resource "aws_ecs_service" "www_ecs_service" {
-  name    = "nerves-hub-www"
+resource "aws_ecs_service" "device_ecs_service" {
+  name    = "nerves-hub-device"
   cluster = module.ecs_cluster.arn
 
   # this needs to be toggled on to update anything in the task besides container (e.g. CPU, memory, etc)
   # task_definition = "${aws_ecs_task_definition.ca_task_definition.family}:${max("${aws_ecs_task_definition.ca_task_definition.revision}", "${data.aws_ecs_task_definition.ca_task_definition.revision}")}"
   # task_definition = "${aws_ecs_task_definition.ca_task_definition.family}:${aws_ecs_task_definition.ca_task_definition.revision}"
 
-  task_definition = aws_ecs_task_definition.www_task_definition.arn
-  desired_count   = var.www_service_desired_count
+  task_definition = aws_ecs_task_definition.device_task_definition.arn
+  desired_count   = var.device_service_desired_count
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
   launch_type = "FARGATE"
 
-  health_check_grace_period_seconds = 300
+  health_check_grace_period_seconds = 600
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.www_lb_tg.arn
-    container_name = "nerves_hub_www"
-    container_port = 80
+    target_group_arn = aws_lb_target_group.device_lb_tg.arn
+    container_name = "${local.device_app_name}"
+    container_port = 443
   }
 
   network_configuration {
@@ -431,7 +400,7 @@ resource "aws_ecs_service" "www_ecs_service" {
   }
 
   depends_on      = [
-    aws_iam_role.www_task_role,
-    aws_lb_listener.www_lb_listener
+    aws_iam_role.device_task_role,
+    aws_lb_listener.device_lb_listener
   ]
 }
