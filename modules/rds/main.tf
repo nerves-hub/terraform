@@ -5,8 +5,8 @@ resource "aws_security_group" "rds_security_group" {
   vpc_id      = var.vpc_id
 
   tags = {
-    environment = terraform.workspace
-    servicename = "${var.identifier}"
+    Environment = terraform.workspace
+    Name = "${var.identifier}-db-sg"
   }
 
   lifecycle {
@@ -33,6 +33,7 @@ resource "aws_db_instance" "default" {
   auto_minor_version_upgrade = true
   deletion_protection        = false
   multi_az                   = false
+  skip_final_snapshot        = true
 
   vpc_security_group_ids = [
     aws_security_group.rds_security_group.id,
@@ -45,7 +46,7 @@ resource "aws_db_instance" "default" {
   }
 
   tags = {
-    environment = terraform.workspace
-    servicename = var.identifier
+    Environment = terraform.workspace
+    Name = "${var.identifier}-db"
   }
 }

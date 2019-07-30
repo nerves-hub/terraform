@@ -7,7 +7,7 @@
 *.log
 
 # Directories
-.terraform/
+.terraform
 .vagrant/
 
 # SSH Keys
@@ -42,3 +42,9 @@ operations/variable-scripts/variable.json
 # Keep secrets in tfvars secret
 terraform.tfvars
 backend.tfvars
+
+# Ignore ssl certificates placed in the ssl_certificates folder
+ssl/staging/*
+ssl/production/*
+!ssl/staging/.empty
+!ssl/production/.empty

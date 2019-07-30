@@ -1,4 +1,4 @@
-# NervesHubCA
+# nerves_hub_ca
 
 # Security Groups
 resource "aws_security_group" "ca_security_group" {
@@ -7,8 +7,8 @@ resource "aws_security_group" "ca_security_group" {
   vpc_id      = module.vpc.vpc_id
 
   tags = {
-    environment = terraform.workspace
-    servicename = "nerves-hub-${terraform.workspace}-ca"
+    Environment = terraform.workspace
+    Name = "nerves-hub-${terraform.workspace}-ca-sg"
   }
 
   lifecycle {
@@ -25,12 +25,40 @@ resource "aws_security_group_rule" "ca_security_group_all_egress" {
   security_group_id = aws_security_group.ca_security_group.id
 }
 
+resource "aws_security_group_rule" "ca_security_group_web_ingress" {
+  type = "ingress"
+  from_port = 8443
+  to_port = 8443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.web_security_group.id
+  security_group_id = aws_security_group.ca_security_group.id
+}
+
+resource "aws_security_group_rule" "db_security_group_ca_ingress" {
+  type = "ingress"
+  from_port = 5432
+  to_port = 5432
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.ca_security_group.id
+  security_group_id = module.ca_db.security_group.id
+}
+
+resource "aws_security_group_rule" "db_security_group_ca_egress" {
+  type = "egress"
+  from_port = 0
+  to_port = 0
+  protocol = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = module.ca_db.security_group.id
+}
+
+
 # Database
-module "rds" {
+module "ca_db" {
   source = "../modules/rds"
 
   name                   = "nerves_hub_ca"
-  identifier             = "nerves-hub-ca-${terraform.workspace}"
+  identifier             = "nerves-hub-${terraform.workspace}-ca"
   username               = var.db_username
   password               = var.db_password
   instance_class         = var.db_instance_class
@@ -47,16 +75,7 @@ resource "aws_s3_bucket" "ca_application_data" {
   acl    = "private"
 
   versioning {
-    enabled = true
-  }
-
-  lifecycle_rule {
-    id      = "expire"
-    enabled = true
-
-    noncurrent_version_expiration {
-      days = 90
-    }
+    enabled = false
   }
 
   server_side_encryption_configuration {
@@ -73,7 +92,7 @@ resource "aws_s3_bucket" "ca_application_data" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "application_data" {
+resource "aws_s3_bucket_public_access_block" "ca_application_data" {
   bucket = aws_s3_bucket.ca_application_data.id
 
   block_public_acls   = true
@@ -84,17 +103,29 @@ resource "aws_s3_bucket_public_access_block" "application_data" {
   ]
 }
 
+resource "aws_s3_bucket_object" "ca_application_data_ssl" {
+    bucket = "${aws_s3_bucket.ca_application_data.id}"
+    acl    = "private"
+    key    = "ssl/"
+    source = "/dev/null"
+    kms_key_id = "${aws_kms_key.app_enc_key.arn}"
+}
+
+resource "null_resource" "sync_ca_application_data_ssl" {
+  provisioner "local-exec" {
+    command = "aws s3 sync ${path.module}/../ssl/${terraform.workspace} s3://${aws_s3_bucket.ca_application_data.id}/ssl"
+  }
+  depends_on = [
+    aws_s3_bucket_object.ca_application_data_ssl
+  ]
+}
+
 # SSM
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_secret_db_url" {
   name      = "/nerves_hub_ca/${terraform.workspace}/DATABASE_URL"
   type      = "SecureString"
-  value     = "postgres://${var.db_username}:${var.db_password}@${module.rds.endpoint}/nerves_hub_ca"
+  value     = "postgres://${var.db_username}:${var.db_password}@${module.ca_db.endpoint}/${var.ca_db_name}"
   overwrite = true
-  lifecycle {
-    ignore_changes = [
-      "value",
-    ]
-  }
 }
 
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_secret_erl_cookie" {
@@ -102,11 +133,6 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_secret_erl_cookie" {
   type      = "SecureString"
   value     = var.erl_cookie
   overwrite = true
-  lifecycle {
-    ignore_changes = [
-      "value",
-    ]
-  }
 }
 
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_s3_bucket" {
@@ -114,11 +140,6 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_s3_bucket" {
   type      = "String"
   value     = aws_s3_bucket.ca_application_data.bucket
   overwrite = true
-  lifecycle {
-    ignore_changes = [
-      "value",
-    ]
-  }
 }
 
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_app_name" {
@@ -126,11 +147,6 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_app_name" {
   type      = "String"
   value     = "nerves_hub_ca"
   overwrite = true
-  lifecycle {
-    ignore_changes = [
-      "value",
-    ]
-  }
 }
 
 # Roles
@@ -156,7 +172,7 @@ EOF
 
 }
 
-data "aws_iam_policy_document" "app_iam_policy" {
+data "aws_iam_policy_document" "ca_iam_policy" {
   statement {
     sid = "1"
 
@@ -258,10 +274,10 @@ data "aws_iam_policy_document" "app_iam_policy" {
 
 resource "aws_iam_policy" "ca_task_policy" {
   name = "nerves-hub-${terraform.workspace}-ca-task-policy"
-  policy = data.aws_iam_policy_document.app_iam_policy.json
+  policy = data.aws_iam_policy_document.ca_iam_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "role_policy_attach" {
+resource "aws_iam_role_policy_attachment" "ca_role_policy_attach" {
   role = aws_iam_role.ca_task_role.name
   policy_arn = aws_iam_policy.ca_task_policy.arn
 }
