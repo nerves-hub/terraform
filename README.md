@@ -4,13 +4,12 @@
 
 The NervesHub terraform scripts are organized to use terraform workspaces.
 To get started, you should copy the `terraform.tfvars.example` file to
-`terraform.tfvars` and change the values for your organization. You will
-want to change the `bucket` value since this refers to an aws s3 bucket
-that will be used to store the remote state for terraform. Once you have
-your variables, you can initialize the setup by running `setup.sh`
+`terraform.tfvars` and change the values for your organization.
 
 You will need to have your aws credentials in the `~/.aws/credentials` file
 using the profile name you defined in the `terraform.tfvars` file.
+
+You can initialize the setup by running `setup.sh`
 
 Answer `yes` to create the initial infrastructure.
 
@@ -40,3 +39,6 @@ Do you want to migrate all workspaces to "s3"?
 
   Enter a value: yes
 ```
+
+The application stack can be deployed by running `staging.sh`
+Billing can optionally be deployed by running `billing.sh`
