@@ -4,7 +4,7 @@
 resource "aws_security_group" "ca_security_group" {
   name        = "nerves-hub-${terraform.workspace}-ca-sg"
   description = "nerves-hub-${terraform.workspace}-ca-sg"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc.vpc_id
 
   tags = {
     Environment = terraform.workspace
@@ -30,7 +30,7 @@ resource "aws_security_group_rule" "ca_security_group_web_ingress" {
   from_port = 8443
   to_port = 8443
   protocol = "tcp"
-  source_security_group_id = aws_security_group.web_security_group.id
+  source_security_group_id = var.web_security_group.id
   security_group_id = aws_security_group.ca_security_group.id
 }
 
@@ -40,7 +40,7 @@ resource "aws_security_group_rule" "db_security_group_ca_ingress" {
   to_port = 5432
   protocol = "tcp"
   source_security_group_id = aws_security_group.ca_security_group.id
-  security_group_id = module.ca_db.security_group.id
+  security_group_id = var.db.security_group.id
 }
 
 resource "aws_security_group_rule" "db_security_group_ca_egress" {
@@ -49,25 +49,9 @@ resource "aws_security_group_rule" "db_security_group_ca_egress" {
   to_port = 0
   protocol = "-1"
   cidr_blocks = ["0.0.0.0/0"]
-  security_group_id = module.ca_db.security_group.id
+  security_group_id = var.db.security_group.id
 }
 
-
-# Database
-module "ca_db" {
-  source = "../modules/rds"
-
-  name                   = "nerves_hub_ca"
-  identifier             = "nerves-hub-${terraform.workspace}-ca"
-  username               = var.db_username
-  password               = var.db_password
-  instance_class         = var.db_instance_class
-  allocated_storage      = var.db_allocated_storage
-  subnet_group           = aws_db_subnet_group.db.name
-  engine_version         = var.db_engine_version
-  vpc_id                 = module.vpc.vpc_id
-  kms_key                = aws_kms_key.db_enc_key.arn
-}
 
 # Storage
 resource "aws_s3_bucket" "ca_application_data" {
@@ -81,7 +65,7 @@ resource "aws_s3_bucket" "ca_application_data" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = "${aws_kms_key.app_enc_key.arn}"
+        kms_master_key_id = "${var.kms_key.arn}"
         sse_algorithm     = "aws:kms"
       }
     }
@@ -104,16 +88,20 @@ resource "aws_s3_bucket_public_access_block" "ca_application_data" {
 }
 
 resource "aws_s3_bucket_object" "ca_application_data_ssl" {
-    bucket = "${aws_s3_bucket.ca_application_data.id}"
-    acl    = "private"
-    key    = "ssl/"
-    source = "/dev/null"
-    kms_key_id = "${aws_kms_key.app_enc_key.arn}"
+  bucket = "${aws_s3_bucket.ca_application_data.id}"
+  acl    = "private"
+  key    = "ssl/"
+  source = "/dev/null"
+  kms_key_id = "${var.kms_key.arn}"
+
+  depends_on = [
+    aws_s3_bucket.ca_application_data
+  ]
 }
 
 resource "null_resource" "sync_ca_application_data_ssl" {
   provisioner "local-exec" {
-    command = "aws s3 sync ${path.module}/../ssl/${terraform.workspace} s3://${aws_s3_bucket.ca_application_data.id}/ssl"
+    command = "aws s3 sync ${path.module}/../../ssl/${terraform.workspace} s3://${aws_s3_bucket.ca_application_data.id}/ssl"
   }
   depends_on = [
     aws_s3_bucket_object.ca_application_data_ssl
@@ -124,7 +112,7 @@ resource "null_resource" "sync_ca_application_data_ssl" {
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_secret_db_url" {
   name      = "/nerves_hub_ca/${terraform.workspace}/DATABASE_URL"
   type      = "SecureString"
-  value     = "postgres://${var.db_username}:${var.db_password}@${module.ca_db.endpoint}/${var.ca_db_name}"
+  value     = "postgres://${var.db.username}:${var.db.password}@${var.db.endpoint}/${var.db.name}"
   overwrite = true
 }
 
@@ -146,6 +134,13 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_app_name" {
   name      = "/nerves_hub_ca/${terraform.workspace}/APP_NAME"
   type      = "String"
   value     = "nerves_hub_ca"
+  overwrite = true
+}
+
+resource "aws_ssm_parameter" "nerves_hub_ca_ssm_host" {
+  name      = "/nerves_hub_ca/${terraform.workspace}/HOST"
+  type      = "String"
+  value     = "ca.${terraform.workspace}.${var.domain}"
   overwrite = true
 }
 
@@ -192,7 +187,7 @@ data "aws_iam_policy_document" "ca_iam_policy" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/nerves_hub_ca/${terraform.workspace}*",
+      "arn:aws:ssm:${var.region}:${var.account_id}:parameter/nerves_hub_ca/${terraform.workspace}*",
     ]
   }
 
@@ -236,7 +231,7 @@ data "aws_iam_policy_document" "ca_iam_policy" {
     ]
 
     resources = [
-      aws_kms_key.app_enc_key.arn,
+      var.kms_key.arn,
     ]
   }
 
@@ -283,17 +278,11 @@ resource "aws_iam_role_policy_attachment" "ca_role_policy_attach" {
 }
 
 # Service discovery
-resource "aws_service_discovery_private_dns_namespace" "local_dns_namespace" {
-  name        = "${terraform.workspace}.nerves-hub.local"
-  description = "${terraform.workspace}"
-  vpc         = module.vpc.vpc_id
-}
-
 resource "aws_service_discovery_service" "ca_service_discovery" {
   name = "ca"
 
   dns_config {
-    namespace_id = "${aws_service_discovery_private_dns_namespace.local_dns_namespace.id}"
+    namespace_id = "${var.local_dns_namespace.id}"
 
     dns_records {
       ttl  = 10
@@ -312,7 +301,7 @@ resource "aws_service_discovery_service" "ca_service_discovery" {
 resource "aws_ecs_task_definition" "ca_task_definition" {
   family = "nerves-hub-${terraform.workspace}-ca"
   task_role_arn = aws_iam_role.ca_task_role.arn
-  execution_role_arn = aws_iam_role.ecs_tasks_execution_role.arn
+  execution_role_arn = var.task_execution_role.arn
 
   network_mode = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -330,7 +319,7 @@ resource "aws_ecs_task_definition" "ca_task_definition" {
          }
        ],
        "networkMode": "awsvpc",
-       "image": "${var.ca_image}",
+       "image": "${var.docker_image}",
        "essential": true,
        "privileged": false,
        "name": "nerves_hub_ca",
@@ -344,7 +333,7 @@ resource "aws_ecs_task_definition" "ca_task_definition" {
          "logDriver": "awslogs",
          "options": {
            "awslogs-region": "${var.region}",
-           "awslogs-group": "${module.ecs_cluster.log_group}",
+           "awslogs-group": "${var.log_group}",
            "awslogs-stream-prefix": "nerves_hub_ca"
          }
        }
@@ -357,14 +346,14 @@ DEFINITION
 
 resource "aws_ecs_service" "ca_ecs_service" {
   name    = "nerves-hub-ca"
-  cluster = module.ecs_cluster.arn
+  cluster = var.cluster.arn
 
   # this needs to be toggled on to update anything in the task besides container (e.g. CPU, memory, etc)
   # task_definition = "${aws_ecs_task_definition.ca_task_definition.family}:${max("${aws_ecs_task_definition.ca_task_definition.revision}", "${data.aws_ecs_task_definition.ca_task_definition.revision}")}"
   # task_definition = "${aws_ecs_task_definition.ca_task_definition.family}:${aws_ecs_task_definition.ca_task_definition.revision}"
 
   task_definition = aws_ecs_task_definition.ca_task_definition.arn
-  desired_count   = var.ca_service_desired_count
+  desired_count   = var.service_count
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
@@ -372,7 +361,7 @@ resource "aws_ecs_service" "ca_ecs_service" {
 
   network_configuration {
     security_groups = [aws_security_group.ca_security_group.id]
-    subnets         = module.vpc.private_subnets
+    subnets         = var.vpc.private_subnets
   }
 
   service_registries {

@@ -7,4 +7,5 @@ module "ecs_cluster" {
   aws_private_subnet_ids = module.vpc.private_subnets
   aws_public_subnet_ids  = module.vpc.public_subnets
   log_retention          = var.log_retention
+  whitelist              = var.whitelist
 }

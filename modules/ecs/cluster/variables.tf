@@ -21,3 +21,7 @@ variable "aws_public_subnet_ids" {
 variable "log_retention" {
   description = "Cloud watch log retention days"
 }
+
+variable "whitelist" {
+  description = "IPs that are allowed to access the cluster from load balancers"
+}

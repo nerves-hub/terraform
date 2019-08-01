@@ -1,0 +1,15 @@
+variable "account_id" {}
+variable "region" {}
+variable "domain" {}
+variable "vpc" {}
+variable "cluster" {}
+variable "db" {}
+variable "kms_key" {}
+variable "bucket_prefix" {}
+variable "docker_image" {}
+variable "log_group" {}
+variable "service_count" {}
+variable "task_execution_role" {}
+variable "erl_cookie" {}
+variable "web_security_group" {}
+variable "local_dns_namespace" {}

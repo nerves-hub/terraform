@@ -114,3 +114,33 @@ variable "device_service_desired_count" {
   description = "The number of NervesHubDevice containers to run"
   default = "1"
 }
+
+variable "api_image" {
+  description = "The docker image of the nerves_hub_api app"
+  default = "nerveshub/nerves_hub_api:latest"
+}
+
+variable "api_service_desired_count" {
+  description = "The number of NervesHubAPI containers to run"
+  default = "1"
+}
+
+variable "whitelist" {
+  description = "The whitelisted IPs for accessing the cluster"
+  default = ["0.0.0.0/0"]
+}
+
+variable "billing_enabled" {
+  description = "Enable billing?"
+  default = false
+}
+
+variable "billing_image" {
+  description = "The docker image of the nerves_hub_billing app"
+  default = "nerveshub/nerves_hub_billing:latest"
+}
+
+variable "billing_service_desired_count" {
+  description = "The number of NervesHubBilling containers to run"
+  default = "1"
+}

@@ -55,6 +55,8 @@ web_secret_key_base = "123456"
 web_smtp_username = "nerveshub"
 web_smtp_password = "12345"
 
+#whitelist = ["0.0.0.0/0"]
+
 #www_service_desired_count = 1
 #www_image = "nerveshub/nerves_hub_www:latest"
 www_live_view_signing_salt = "123456"
@@ -65,6 +67,5 @@ www_live_view_signing_salt = "123456"
 #device_service_desired_count = 1
 #device_image = "nerveshub/nerves_hub_www:latest"
 
-#billing_enabled = false
 #billing_service_desired_count = 1
 #billing_image = "nerveshub/nerves_hub_billing:latest"

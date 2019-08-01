@@ -1,5 +1,5 @@
 locals {
-  subnet = "${terraform.workspace == "staging" ? 10 : 20}"
+  subnet = "${terraform.workspace == "production" ? 20 : 10}"
 }
 
 module "vpc" {
@@ -22,7 +22,7 @@ module "vpc" {
   enable_dns_hostnames         = true
   enable_dns_support           = true
   tags = {
-    Owner       = "nerves-hub"
+    Owner       =  "nerves-hub-${terraform.workspace}"
     Environment = "${terraform.workspace}"
   }
 }

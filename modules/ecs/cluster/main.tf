@@ -41,26 +41,6 @@ resource "aws_security_group" "lb_security_group" {
   }
 }
 
-# allow inbound traffic from other instances in this cluster
-# for cross service communications
-resource "aws_security_group_rule" "lb_security_group_cluster_http_ingress" {
-  type = "ingress"
-  from_port = 80
-  to_port = 80
-  protocol = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.lb_security_group.id
-}
-
-resource "aws_security_group_rule" "lb_security_group_cluster_https_ingress" {
-  type = "ingress"
-  from_port = 443
-  to_port = 443
-  protocol = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.lb_security_group.id
-}
-
 resource "aws_security_group_rule" "lb_security_group_all_egress" {
   type = "egress"
   from_port = 0
@@ -68,6 +48,28 @@ resource "aws_security_group_rule" "lb_security_group_all_egress" {
   protocol = "-1"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = aws_security_group.lb_security_group.id
+}
+
+resource "aws_security_group_rule" "lb_security_group_cluster_http_ingress" {
+  count  = "${length(var.whitelist)}"
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  cidr_blocks = ["${element(var.whitelist, count.index)}"]
+  security_group_id = aws_security_group.lb_security_group.id
+  description = "${element(var.whitelist, count.index)} Access"
+}
+
+resource "aws_security_group_rule" "lb_security_group_cluster_https_ingress" {
+  count  = "${length(var.whitelist)}"
+  type = "ingress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  cidr_blocks = ["${element(var.whitelist, count.index)}"]
+  security_group_id = aws_security_group.lb_security_group.id
+  description = "${element(var.whitelist, count.index)} Access"
 }
 
 resource "aws_cloudwatch_log_group" "app" {

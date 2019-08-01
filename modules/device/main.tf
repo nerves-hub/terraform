@@ -4,24 +4,34 @@ locals {
   device_app_name = "nerves_hub_device"
 }
 
+resource "random_integer" "target_group_id" {
+  min = 1
+  max = 999
+}
+
 # Load Balancer
 resource "aws_lb_target_group" "device_lb_tg" {
-  name     = "nerves-hub-${terraform.workspace}-device-tg"
-  port     = 443
-  protocol = "TCP"
-  target_type = "ip"
-  vpc_id   = module.vpc.vpc_id
+  name                 = "nerves-hub-${terraform.workspace}-device-tg-${random_integer.target_group_id.result}"
+  port                 = 443
+  protocol             = "TCP"
+  target_type          = "ip"
+  vpc_id               = var.vpc.vpc_id
+  deregistration_delay = 0
 
   health_check {
-    healthy_threshold = 3
+    protocol = "TCP"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
 resource "aws_lb" "device_lb" {
-  name               = "nerves-hub-${terraform.workspace}-device-lb"
-  internal           = false
-  load_balancer_type = "network"
-  subnets            = module.vpc.public_subnets
+  name                 = "nerves-hub-${terraform.workspace}-device-lb"
+  internal             = false
+  load_balancer_type   = "network"
+  subnets              = var.vpc.public_subnets
   tags = {
     Environment = terraform.workspace
   }
@@ -39,7 +49,7 @@ resource "aws_lb_listener" "device_lb_listener" {
 }
 
 resource "aws_route53_record" "device_dns_record" {
-  zone_id = data.aws_route53_zone.dns_zone.zone_id
+  zone_id = var.public_dns_zone.zone_id
   name    = terraform.workspace == "production" ? "device.${var.domain}." : "device.${terraform.workspace}.${var.domain}."
   type    = "A"
 
@@ -58,7 +68,7 @@ resource "aws_route53_record" "device_dns_record" {
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_db_url" {
   name      = "/${local.device_app_name}/${terraform.workspace}/DATABASE_URL"
   type      = "SecureString"
-  value     = "postgres://${var.db_username}:${var.db_password}@${module.web_db.endpoint}/${var.web_db_name}"
+  value     = "postgres://${var.db.username}:${var.db.password}@${var.db.endpoint}/${var.db.name}"
   overwrite = true
 }
 
@@ -72,14 +82,14 @@ resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_erl_cookie" {
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_s3_ssl_bucket" {
   name      = "/${local.device_app_name}/${terraform.workspace}/S3_SSL_BUCKET"
   type      = "String"
-  value     = aws_s3_bucket.ca_application_data.bucket
+  value     = var.ca_bucket
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_s3_log_bucket_name" {
   name      = "/${local.device_app_name}/${terraform.workspace}/S3_LOG_BUCKET_NAME"
   type      = "String"
-  value     = aws_s3_bucket.web_firmware_transfer_logs.bucket
+  value     = var.log_bucket
   overwrite = true
 }
 
@@ -93,7 +103,7 @@ resource "aws_ssm_parameter" "nerves_hub_device_ssm_app_name" {
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_cluster" {
   name      = "/${local.device_app_name}/${terraform.workspace}/CLUSTER"
   type      = "String"
-  value     = terraform.workspace == "production" ? "nerves-hub" : "nerves-hub-${terraform.workspace}"
+  value     = var.cluster.name
   overwrite = true
 }
 
@@ -121,14 +131,14 @@ resource "aws_ssm_parameter" "nerves_hub_device_ssm_host" {
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_s3_bucket_name" {
   name      = "/${local.device_app_name}/${terraform.workspace}/S3_BUCKET_NAME"
   type      = "String"
-  value     = aws_s3_bucket.web_application_data.bucket
+  value     = var.app_bucket
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_secret_key_base" {
   name      = "/${local.device_app_name}/${terraform.workspace}/SECRET_KEY_BASE"
   type      = "SecureString"
-  value     = var.web_secret_key_base
+  value     = var.secret_key_base
   overwrite = true
 }
 
@@ -149,14 +159,14 @@ resource "aws_ssm_parameter" "nerves_hub_device_ssm_ses_server" {
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_smtp_username" {
   name      = "/${local.device_app_name}/${terraform.workspace}/SMTP_USERNAME"
   type      = "SecureString"
-  value     = var.web_smtp_password
+  value     = var.smtp_password
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_smtp_password" {
   name      = "/${local.device_app_name}/${terraform.workspace}/SMTP_PASSWORD"
   type      = "SecureString"
-  value     = var.web_smtp_username
+  value     = var.smtp_username
   overwrite = true
 }
 
@@ -203,7 +213,7 @@ data "aws_iam_policy_document" "device_iam_policy" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/${local.device_app_name}/${terraform.workspace}*"
+      "arn:aws:ssm:${var.region}:${var.account_id}:parameter/${local.device_app_name}/${terraform.workspace}*"
     ]
   }
 
@@ -213,8 +223,8 @@ data "aws_iam_policy_document" "device_iam_policy" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.web_application_data.bucket}",
-      "arn:aws:s3:::${aws_s3_bucket.ca_application_data.bucket}"
+      "arn:aws:s3:::${var.app_bucket}",
+      "arn:aws:s3:::${var.ca_bucket}"
     ]
   }
 
@@ -238,7 +248,7 @@ data "aws_iam_policy_document" "device_iam_policy" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.web_application_data.bucket}/*"
+      "arn:aws:s3:::${var.app_bucket}/*"
     ]
   }
 
@@ -256,7 +266,7 @@ data "aws_iam_policy_document" "device_iam_policy" {
     ]
 
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.ca_application_data.bucket}/ssl/*"
+      "arn:aws:s3:::${var.ca_bucket}/ssl/*"
     ]
   }
 
@@ -266,7 +276,7 @@ data "aws_iam_policy_document" "device_iam_policy" {
     ]
 
     resources = [
-      aws_kms_key.app_enc_key.arn,
+      var.kms_key.arn,
     ]
   }
 
@@ -319,7 +329,7 @@ resource "aws_iam_role_policy_attachment" "device_role_policy_attach" {
 resource "aws_ecs_task_definition" "device_task_definition" {
   family = "nerves-hub-${terraform.workspace}-device"
   task_role_arn = aws_iam_role.device_task_role.arn
-  execution_role_arn = aws_iam_role.ecs_tasks_execution_role.arn
+  execution_role_arn = var.task_execution_role.arn
 
   network_mode = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -337,7 +347,7 @@ resource "aws_ecs_task_definition" "device_task_definition" {
          }
        ],
        "networkMode": "awsvpc",
-       "image": "${var.device_image}",
+       "image": "${var.docker_image}",
        "essential": true,
        "privileged": false,
        "name": "${local.device_app_name}",
@@ -355,7 +365,7 @@ resource "aws_ecs_task_definition" "device_task_definition" {
          "logDriver": "awslogs",
          "options": {
            "awslogs-region": "${var.region}",
-           "awslogs-group": "${module.ecs_cluster.log_group}",
+           "awslogs-group": "${var.log_group}",
            "awslogs-stream-prefix": "${local.device_app_name}"
          }
        }
@@ -368,20 +378,20 @@ DEFINITION
 
 resource "aws_ecs_service" "device_ecs_service" {
   name    = "nerves-hub-device"
-  cluster = module.ecs_cluster.arn
+  cluster = var.cluster.arn
 
   # this needs to be toggled on to update anything in the task besides container (e.g. CPU, memory, etc)
-  # task_definition = "${aws_ecs_task_definition.ca_task_definition.family}:${max("${aws_ecs_task_definition.ca_task_definition.revision}", "${data.aws_ecs_task_definition.ca_task_definition.revision}")}"
-  # task_definition = "${aws_ecs_task_definition.ca_task_definition.family}:${aws_ecs_task_definition.ca_task_definition.revision}"
+  # task_definition = "${aws_ecs_task_definition.device_task_definition.family}:${max("${aws_ecs_task_definition.device_task_definition.revision}", "${data.aws_ecs_task_definition.device_task_definition.revision}")}"
+  # task_definition = "${aws_ecs_task_definition.device_task_definition.family}:${aws_ecs_task_definition.device_task_definition.revision}"
 
   task_definition = aws_ecs_task_definition.device_task_definition.arn
-  desired_count   = var.device_service_desired_count
+  desired_count   = var.service_count
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
   launch_type = "FARGATE"
 
-  health_check_grace_period_seconds = 600
+  health_check_grace_period_seconds = 300
 
   load_balancer {
     target_group_arn = aws_lb_target_group.device_lb_tg.arn
@@ -390,8 +400,8 @@ resource "aws_ecs_service" "device_ecs_service" {
   }
 
   network_configuration {
-    security_groups = [aws_security_group.web_security_group.id]
-    subnets         = module.vpc.private_subnets
+    security_groups = [var.task_security_group_id]
+    subnets         = var.vpc.private_subnets
   }
 
   # After the first setup, we want to ignore this so deploys aren't reverted
