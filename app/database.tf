@@ -1,4 +1,4 @@
-  data "aws_subnet_ids" "db_subnet" {
+data "aws_subnet_ids" "db_subnet" {
   vpc_id = module.vpc.vpc_id
   filter {
     name   = "tag:Name"

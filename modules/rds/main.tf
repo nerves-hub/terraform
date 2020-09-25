@@ -6,7 +6,7 @@ resource "aws_security_group" "rds_security_group" {
 
   tags = {
     Environment = terraform.workspace
-    Name = "${var.identifier}-db-sg"
+    Name        = "${var.identifier}-db-sg"
   }
 
   lifecycle {
@@ -47,6 +47,6 @@ resource "aws_db_instance" "default" {
 
   tags = {
     Environment = terraform.workspace
-    Name = "${var.identifier}-db"
+    Name        = "${var.identifier}-db"
   }
 }

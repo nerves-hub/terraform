@@ -64,7 +64,7 @@ data "template_file" "operator_arn" {
 }
 
 data "template_file" "terraform_state_policy" {
-  count = "${var.bootstrap}"
+  count    = "${var.bootstrap}"
   template = "${file("${path.module}/templates/policy.json.tpl")}"
 
   vars = {
