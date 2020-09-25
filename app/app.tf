@@ -160,14 +160,14 @@ resource "aws_s3_bucket" "web_application_data" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = "${aws_kms_key.app_enc_key.arn}"
+        kms_master_key_id = aws_kms_key.app_enc_key.arn
         sse_algorithm     = "aws:kms"
       }
     }
   }
 
   logging {
-    target_bucket = "${aws_s3_bucket.web_firmware_transfer_logs.id}"
+    target_bucket = aws_s3_bucket.web_firmware_transfer_logs.id
     target_prefix = "/"
   }
 
@@ -188,11 +188,11 @@ resource "aws_s3_bucket_public_access_block" "web_application_data" {
 }
 
 resource "aws_s3_bucket_object" "web_application_data_firmware" {
-  bucket     = "${aws_s3_bucket.web_application_data.id}"
+  bucket     = aws_s3_bucket.web_application_data.id
   acl        = "private"
   key        = "firmware/"
   source     = "/dev/null"
-  kms_key_id = "${aws_kms_key.app_enc_key.arn}"
+  kms_key_id = aws_kms_key.app_enc_key.arn
 }
 
 # DNS
@@ -203,7 +203,7 @@ data "aws_route53_zone" "dns_zone" {
 
 resource "aws_service_discovery_private_dns_namespace" "local_dns_namespace" {
   name        = "${terraform.workspace}.nerves-hub.local"
-  description = "${terraform.workspace}"
+  description = terraform.workspace
   vpc         = module.vpc.vpc_id
 }
 

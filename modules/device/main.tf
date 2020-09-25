@@ -38,13 +38,13 @@ resource "aws_lb" "device_lb" {
 }
 
 resource "aws_lb_listener" "device_lb_listener" {
-  load_balancer_arn = "${aws_lb.device_lb.arn}"
+  load_balancer_arn = aws_lb.device_lb.arn
   port              = "443"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.device_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.device_lb_tg.arn
   }
 }
 
@@ -395,7 +395,7 @@ resource "aws_ecs_service" "device_ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.device_lb_tg.arn
-    container_name   = "${local.device_app_name}"
+    container_name   = local.device_app_name
     container_port   = 443
   }
 

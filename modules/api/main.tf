@@ -37,13 +37,13 @@ resource "aws_lb" "api_lb" {
 }
 
 resource "aws_lb_listener" "api_lb_listener" {
-  load_balancer_arn = "${aws_lb.api_lb.arn}"
+  load_balancer_arn = aws_lb.api_lb.arn
   port              = "443"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.api_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.api_lb_tg.arn
   }
 }
 

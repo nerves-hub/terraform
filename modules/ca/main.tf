@@ -65,7 +65,7 @@ resource "aws_s3_bucket" "ca_application_data" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = "${var.kms_key.arn}"
+        kms_master_key_id = var.kms_key.arn
         sse_algorithm     = "aws:kms"
       }
     }
@@ -88,11 +88,11 @@ resource "aws_s3_bucket_public_access_block" "ca_application_data" {
 }
 
 resource "aws_s3_bucket_object" "ca_application_data_ssl" {
-  bucket     = "${aws_s3_bucket.ca_application_data.id}"
+  bucket     = aws_s3_bucket.ca_application_data.id
   acl        = "private"
   key        = "ssl/"
   source     = "/dev/null"
-  kms_key_id = "${var.kms_key.arn}"
+  kms_key_id = var.kms_key.arn
 
   depends_on = [
     aws_s3_bucket.ca_application_data
@@ -282,7 +282,7 @@ resource "aws_service_discovery_service" "ca_service_discovery" {
   name = "ca"
 
   dns_config {
-    namespace_id = "${var.local_dns_namespace.id}"
+    namespace_id = var.local_dns_namespace.id
 
     dns_records {
       ttl  = 10

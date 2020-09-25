@@ -38,13 +38,13 @@ resource "aws_lb" "www_lb" {
 }
 
 resource "aws_lb_listener" "www_lb_listener" {
-  load_balancer_arn = "${aws_lb.www_lb.arn}"
+  load_balancer_arn = aws_lb.www_lb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.www_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.www_lb_tg.arn
   }
 }
 
@@ -78,7 +78,7 @@ resource "aws_lb_listener" "www_ssl_lb_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.www_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.www_lb_tg.arn
   }
 }
 

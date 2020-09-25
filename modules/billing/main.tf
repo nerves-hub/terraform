@@ -89,11 +89,11 @@ resource "aws_ssm_parameter" "nerves_hub_billing_ssm_host" {
 }
 
 resource "aws_s3_bucket_object" "web_application_data_billing" {
-  bucket     = "${var.app_bucket}"
+  bucket     = var.app_bucket
   acl        = "private"
   key        = "billing/"
   source     = "/dev/null"
-  kms_key_id = "${var.kms_key.arn}"
+  kms_key_id = var.kms_key.arn
 }
 
 # Roles
@@ -256,7 +256,7 @@ resource "aws_service_discovery_service" "billing_service_discovery" {
   name = "billing"
 
   dns_config {
-    namespace_id = "${var.local_dns_namespace.id}"
+    namespace_id = var.local_dns_namespace.id
 
     dns_records {
       ttl  = 10
