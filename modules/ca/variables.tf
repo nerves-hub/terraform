@@ -13,3 +13,11 @@ variable "task_execution_role" {}
 variable "erl_cookie" {}
 variable "web_security_group" {}
 variable "local_dns_namespace" {}
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resources"
+  type        = map(string)
+  default = {
+    terraform = true
+  }
+}

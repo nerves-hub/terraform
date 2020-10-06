@@ -11,3 +11,11 @@ variable "operators" {
 variable "bucket" {}
 variable "key" {}
 variable "dynamodb_table" {}
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resources"
+  type        = map(string)
+  default = {
+    terraform = true
+  }
+}

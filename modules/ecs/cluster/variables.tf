@@ -25,3 +25,11 @@ variable "log_retention" {
 variable "whitelist" {
   description = "IPs that are allowed to access the cluster from load balancers"
 }
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resources"
+  type        = map(string)
+  default = {
+    terraform = true
+  }
+}
