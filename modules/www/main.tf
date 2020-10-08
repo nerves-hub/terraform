@@ -7,22 +7,22 @@ resource "random_integer" "target_group_id" {
 
 # Load Balancer
 resource "aws_lb_target_group" "www_lb_tg" {
-  name     = "nerves-hub-${terraform.workspace}-www-tg-${random_integer.target_group_id.result}"
-  port     = 80
-  protocol = "HTTP"
+  name        = "nerves-hub-${terraform.workspace}-www-tg-${random_integer.target_group_id.result}"
+  port        = 80
+  protocol    = "HTTP"
   target_type = "ip"
-  vpc_id   = var.vpc.vpc_id
+  vpc_id      = var.vpc.vpc_id
 
   health_check {
-    interval = 20
-    timeout = 10
-    healthy_threshold = 3
+    interval            = 20
+    timeout             = 10
+    healthy_threshold   = 3
     unhealthy_threshold = 3
-    matcher = "200-399"
+    matcher             = "200-399"
   }
 
-  lifecycle  {
-    create_before_destroy=true
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -38,13 +38,13 @@ resource "aws_lb" "www_lb" {
 }
 
 resource "aws_lb_listener" "www_lb_listener" {
-  load_balancer_arn = "${aws_lb.www_lb.arn}"
+  load_balancer_arn = aws_lb.www_lb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.www_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.www_lb_tg.arn
   }
 }
 
@@ -78,7 +78,7 @@ resource "aws_lb_listener" "www_ssl_lb_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.www_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.www_lb_tg.arn
   }
 }
 
@@ -343,25 +343,25 @@ data "aws_iam_policy_document" "www_iam_policy" {
 
 
 resource "aws_iam_policy" "www_task_policy" {
-  name = "nerves-hub-${terraform.workspace}-www-task-policy"
+  name   = "nerves-hub-${terraform.workspace}-www-task-policy"
   policy = data.aws_iam_policy_document.www_iam_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "www_role_policy_attach" {
-  role = aws_iam_role.www_task_role.name
+  role       = aws_iam_role.www_task_role.name
   policy_arn = aws_iam_policy.www_task_policy.arn
 }
 
 # ECS
 resource "aws_ecs_task_definition" "www_task_definition" {
-  family = "nerves-hub-${terraform.workspace}-www"
-  task_role_arn = aws_iam_role.www_task_role.arn
+  family             = "nerves-hub-${terraform.workspace}-www"
+  task_role_arn      = aws_iam_role.www_task_role.arn
   execution_role_arn = var.task_execution_role.arn
 
-  network_mode = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu = "256"
-  memory = "512"
+  cpu                      = "256"
+  memory                   = "512"
 
   container_definitions = <<DEFINITION
    [
@@ -416,14 +416,14 @@ resource "aws_ecs_service" "www_ecs_service" {
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
-  launch_type = "FARGATE"
+  launch_type                        = "FARGATE"
 
   health_check_grace_period_seconds = 300
 
   load_balancer {
     target_group_arn = aws_lb_target_group.www_lb_tg.arn
-    container_name = "nerves_hub_www"
-    container_port = 80
+    container_name   = "nerves_hub_www"
+    container_port   = 80
   }
 
   network_configuration {
@@ -436,7 +436,7 @@ resource "aws_ecs_service" "www_ecs_service" {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
 
-  depends_on      = [
+  depends_on = [
     aws_iam_role.www_task_role,
     aws_lb_listener.www_lb_listener
   ]

@@ -28,23 +28,23 @@ resource "aws_lb_target_group" "device_lb_tg" {
 }
 
 resource "aws_lb" "device_lb" {
-  name                 = "nerves-hub-${terraform.workspace}-device-lb"
-  internal             = false
-  load_balancer_type   = "network"
-  subnets              = var.vpc.public_subnets
+  name               = "nerves-hub-${terraform.workspace}-device-lb"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = var.vpc.public_subnets
   tags = {
     Environment = terraform.workspace
   }
 }
 
 resource "aws_lb_listener" "device_lb_listener" {
-  load_balancer_arn = "${aws_lb.device_lb.arn}"
+  load_balancer_arn = aws_lb.device_lb.arn
   port              = "443"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.device_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.device_lb_tg.arn
   }
 }
 
@@ -316,25 +316,25 @@ data "aws_iam_policy_document" "device_iam_policy" {
 }
 
 resource "aws_iam_policy" "device_task_policy" {
-  name = "nerves-hub-${terraform.workspace}-device-task-policy"
+  name   = "nerves-hub-${terraform.workspace}-device-task-policy"
   policy = data.aws_iam_policy_document.device_iam_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "device_role_policy_attach" {
-  role = aws_iam_role.device_task_role.name
+  role       = aws_iam_role.device_task_role.name
   policy_arn = aws_iam_policy.device_task_policy.arn
 }
 
 # ECS
 resource "aws_ecs_task_definition" "device_task_definition" {
-  family = "nerves-hub-${terraform.workspace}-device"
-  task_role_arn = aws_iam_role.device_task_role.arn
+  family             = "nerves-hub-${terraform.workspace}-device"
+  task_role_arn      = aws_iam_role.device_task_role.arn
   execution_role_arn = var.task_execution_role.arn
 
-  network_mode = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu = "256"
-  memory = "512"
+  cpu                      = "256"
+  memory                   = "512"
 
   container_definitions = <<DEFINITION
    [
@@ -389,14 +389,14 @@ resource "aws_ecs_service" "device_ecs_service" {
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
-  launch_type = "FARGATE"
+  launch_type                        = "FARGATE"
 
   health_check_grace_period_seconds = 300
 
   load_balancer {
     target_group_arn = aws_lb_target_group.device_lb_tg.arn
-    container_name = "${local.device_app_name}"
-    container_port = 443
+    container_name   = local.device_app_name
+    container_port   = 443
   }
 
   network_configuration {
@@ -409,7 +409,7 @@ resource "aws_ecs_service" "device_ecs_service" {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
 
-  depends_on      = [
+  depends_on = [
     aws_iam_role.device_task_role,
     aws_lb_listener.device_lb_listener
   ]
