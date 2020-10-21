@@ -32,9 +32,7 @@ resource "aws_lb" "www_lb" {
   load_balancer_type = "application"
   security_groups    = [var.lb_security_group_id]
   subnets            = var.vpc.public_subnets
-  tags = {
-    Environment = terraform.workspace
-  }
+  tags               = var.tags
 }
 
 resource "aws_lb_listener" "www_lb_listener" {

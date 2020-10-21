@@ -32,9 +32,7 @@ resource "aws_lb" "device_lb" {
   internal           = false
   load_balancer_type = "network"
   subnets            = var.vpc.public_subnets
-  tags = {
-    Environment = terraform.workspace
-  }
+  tags               = var.tags
 }
 
 resource "aws_lb_listener" "device_lb_listener" {

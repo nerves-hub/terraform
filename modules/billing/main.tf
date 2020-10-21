@@ -6,10 +6,7 @@ resource "aws_security_group" "billing_security_group" {
   description = "nerves-hub-${terraform.workspace}-billing-sg"
   vpc_id      = var.vpc.vpc_id
 
-  tags = {
-    Environment = terraform.workspace
-    Name        = "nerves-hub-${terraform.workspace}-billing-sg"
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true

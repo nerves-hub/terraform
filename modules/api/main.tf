@@ -31,9 +31,7 @@ resource "aws_lb" "api_lb" {
   load_balancer_type = "network"
   subnets            = var.vpc.public_subnets
 
-  tags = {
-    Environment = terraform.workspace
-  }
+  tags = var.tags
 }
 
 resource "aws_lb_listener" "api_lb_listener" {

@@ -30,11 +30,7 @@ resource "aws_security_group" "lb_security_group" {
   description = "${aws_ecs_cluster.ecs_cluster.name} load balancers"
   vpc_id      = var.aws_vpc_id
 
-  tags = {
-    Name      = "${aws_ecs_cluster.ecs_cluster.name}-load-balancer"
-    Cluster   = aws_ecs_cluster.ecs_cluster.name
-    Terraform = true
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true

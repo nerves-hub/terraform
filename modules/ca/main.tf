@@ -6,10 +6,7 @@ resource "aws_security_group" "ca_security_group" {
   description = "nerves-hub-${terraform.workspace}-ca-sg"
   vpc_id      = var.vpc.vpc_id
 
-  tags = {
-    Environment = terraform.workspace
-    Name        = "nerves-hub-${terraform.workspace}-ca-sg"
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true
@@ -71,9 +68,7 @@ resource "aws_s3_bucket" "ca_application_data" {
     }
   }
 
-  tags = {
-    Origin = "Terraform"
-  }
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_public_access_block" "ca_application_data" {
