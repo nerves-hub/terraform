@@ -37,13 +37,13 @@ resource "aws_lb" "api_lb" {
 }
 
 resource "aws_lb_listener" "api_lb_listener" {
-  load_balancer_arn = "${aws_lb.api_lb.arn}"
+  load_balancer_arn = aws_lb.api_lb.arn
   port              = "443"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.api_lb_tg.arn}"
+    target_group_arn = aws_lb_target_group.api_lb_tg.arn
   }
 }
 
@@ -402,7 +402,7 @@ resource "aws_ecs_service" "api_ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.api_lb_tg.arn
-    container_name   = "${local.app_name}"
+    container_name   = local.app_name
     container_port   = 443
   }
 

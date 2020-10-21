@@ -51,23 +51,23 @@ resource "aws_security_group_rule" "lb_security_group_all_egress" {
 }
 
 resource "aws_security_group_rule" "lb_security_group_cluster_http_ingress" {
-  count             = "${length(var.whitelist)}"
+  count             = length(var.whitelist)
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  cidr_blocks       = ["${element(var.whitelist, count.index)}"]
+  cidr_blocks       = [element(var.whitelist, count.index)]
   security_group_id = aws_security_group.lb_security_group.id
   description       = "${element(var.whitelist, count.index)} Access"
 }
 
 resource "aws_security_group_rule" "lb_security_group_cluster_https_ingress" {
-  count             = "${length(var.whitelist)}"
+  count             = length(var.whitelist)
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["${element(var.whitelist, count.index)}"]
+  cidr_blocks       = [element(var.whitelist, count.index)]
   security_group_id = aws_security_group.lb_security_group.id
   description       = "${element(var.whitelist, count.index)} Access"
 }
