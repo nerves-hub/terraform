@@ -273,11 +273,14 @@ resource "aws_ecs_task_definition" "billing_task_definition" {
   family             = "nerves-hub-${terraform.workspace}-billing"
   task_role_arn      = aws_iam_role.billing_task_role.arn
   execution_role_arn = var.task_execution_role.arn
+  propagate_tags     = "TASK_DEFINITION"
 
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
+
+  tags = var.tags
 
   container_definitions = <<DEFINITION
    [
@@ -325,6 +328,7 @@ resource "aws_ecs_service" "billing_ecs_service" {
 
   task_definition = aws_ecs_task_definition.billing_task_definition.arn
   desired_count   = var.service_count
+  propagate_tags  = "TASK_DEFINITION"
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
@@ -343,6 +347,8 @@ resource "aws_ecs_service" "billing_ecs_service" {
   lifecycle {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
+
+  tags = var.tags
 
   depends_on = [
     aws_iam_role.billing_task_role

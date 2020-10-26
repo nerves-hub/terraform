@@ -24,6 +24,8 @@ resource "aws_lb_target_group" "www_lb_tg" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb" "www_lb" {
@@ -78,6 +80,8 @@ resource "aws_lb_listener" "www_ssl_lb_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.www_lb_tg.arn
   }
+
+  tags = var.tags
 }
 
 # SSM
@@ -360,6 +364,7 @@ resource "aws_ecs_task_definition" "www_task_definition" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
+  tags                     = var.tags
 
   container_definitions = <<DEFINITION
    [
@@ -411,6 +416,7 @@ resource "aws_ecs_service" "www_ecs_service" {
 
   task_definition = aws_ecs_task_definition.www_task_definition.arn
   desired_count   = var.service_count
+  propagate_tags  = "TASK_DEFINITION"
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
@@ -433,6 +439,8 @@ resource "aws_ecs_service" "www_ecs_service" {
   lifecycle {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
+
+  tags = var.tags
 
   depends_on = [
     aws_iam_role.www_task_role,
