@@ -6,10 +6,7 @@ resource "aws_security_group" "ca_security_group" {
   description = "nerves-hub-${terraform.workspace}-ca-sg"
   vpc_id      = var.vpc.vpc_id
 
-  tags = {
-    Environment = terraform.workspace
-    Name        = "nerves-hub-${terraform.workspace}-ca-sg"
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true
@@ -71,9 +68,7 @@ resource "aws_s3_bucket" "ca_application_data" {
     }
   }
 
-  tags = {
-    Origin = "Terraform"
-  }
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_public_access_block" "ca_application_data" {
@@ -308,6 +303,8 @@ resource "aws_ecs_task_definition" "ca_task_definition" {
   cpu                      = "256"
   memory                   = "512"
 
+  tags = var.tags
+
   container_definitions = <<DEFINITION
    [
      {
@@ -354,6 +351,7 @@ resource "aws_ecs_service" "ca_ecs_service" {
 
   task_definition = aws_ecs_task_definition.ca_task_definition.arn
   desired_count   = var.service_count
+  propagate_tags  = "TASK_DEFINITION"
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
@@ -372,6 +370,8 @@ resource "aws_ecs_service" "ca_ecs_service" {
   lifecycle {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
+
+  tags = var.tags
 
   depends_on = [
     aws_iam_role.ca_task_role

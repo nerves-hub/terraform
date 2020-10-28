@@ -25,6 +25,8 @@ resource "aws_lb_target_group" "device_lb_tg" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb" "device_lb" {
@@ -32,9 +34,7 @@ resource "aws_lb" "device_lb" {
   internal           = false
   load_balancer_type = "network"
   subnets            = var.vpc.public_subnets
-  tags = {
-    Environment = terraform.workspace
-  }
+  tags               = var.tags
 }
 
 resource "aws_lb_listener" "device_lb_listener" {
@@ -386,6 +386,7 @@ resource "aws_ecs_service" "device_ecs_service" {
 
   task_definition = aws_ecs_task_definition.device_task_definition.arn
   desired_count   = var.service_count
+  propagate_tags  = "TASK_DEFINITION"
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
@@ -408,6 +409,8 @@ resource "aws_ecs_service" "device_ecs_service" {
   lifecycle {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
+
+  tags = var.tags
 
   depends_on = [
     aws_iam_role.device_task_role,

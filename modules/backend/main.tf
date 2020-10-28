@@ -6,9 +6,7 @@ resource "aws_kms_key" "tf_enc_key" {
   description             = "Global Terraform state encryption key"
   deletion_window_in_days = 30
 
-  tags = {
-    Origin = "Terraform"
-  }
+  tags = var.tags
 }
 
 # S3 Bucket
@@ -41,9 +39,7 @@ resource "aws_s3_bucket" "terraform_state" {
     }
   }
 
-  tags = {
-    Origin = "Terraform"
-  }
+  tags = var.tags
 }
 
 # S3 Bucket Policy
@@ -96,7 +92,5 @@ resource "aws_dynamodb_table" "terraform_statelock" {
     type = "S"
   }
 
-  tags = {
-    Origin = "Terraform"
-  }
+  tags = var.tags
 }
