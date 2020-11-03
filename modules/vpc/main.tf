@@ -5,7 +5,7 @@ module "vpc" {
   name = var.name
   cidr = "10.${var.subnet[terraform.workspace]}.0.0/16"
 
-  azs                 = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  azs                 = var.azs
   private_subnets     = ["10.${var.subnet[terraform.workspace]}.1.0/24", "10.${var.subnet[terraform.workspace]}.2.0/24", "10.${var.subnet[terraform.workspace]}.3.0/24"]
   public_subnets      = ["10.${var.subnet[terraform.workspace]}.11.0/24", "10.${var.subnet[terraform.workspace]}.12.0/24", "10.${var.subnet[terraform.workspace]}.13.0/24"]
   database_subnets    = ["10.${var.subnet[terraform.workspace]}.21.0/24", "10.${var.subnet[terraform.workspace]}.22.0/24", "10.${var.subnet[terraform.workspace]}.23.0/24"]

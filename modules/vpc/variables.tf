@@ -17,6 +17,12 @@ variable "subnet" {
   type = map(string)
 }
 
+variable "azs" {
+  description = "A list of availability zones names or ids in the region"
+  type = list(string)
+  default = ["us-east-1a", "us-east-1b", "us-east-1c"]
+}
+
 variable "create_database_subnet_group" {
   type    = bool
   default = true
