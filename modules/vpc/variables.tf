@@ -13,7 +13,7 @@ variable "name" {
 }
 
 variable "subnet" {
-  description = ""
+  description = "The second octet in the address to use for the subnet"
   type = map(string)
 }
 

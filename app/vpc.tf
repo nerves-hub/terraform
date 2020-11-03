@@ -2,7 +2,7 @@ locals {
   subnet = {
     # Add your terraform workspaces and associated subnet here
     "production" = 20
-    "dev"        = 10
+    "staging"    = 10
   }
 }
 
