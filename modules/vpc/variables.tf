@@ -6,7 +6,7 @@ variable "tags" {
   }
 }
 
-variable "app_name" {
+variable "name" {
   description = "The application name"
   type        = string
   default     = "nerves-hub"

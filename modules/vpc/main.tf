@@ -2,7 +2,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 2.63"
 
-  name = "${var.app_name}-${terraform.workspace}-vpc"
+  name = var.name
   cidr = "10.${var.subnet[terraform.workspace]}.0.0/16"
 
   azs                 = ["us-east-1a", "us-east-1b", "us-east-1c"]
@@ -20,7 +20,7 @@ module "vpc" {
   enable_dns_support               = var.enable_dns_support
   one_nat_gateway_per_az           = var.one_nat_gateway_per_az
   manage_default_vpc               = var.manage_default_vpc
-  default_vpc_name                 = "${var.app_name}-${terraform.workspace}-default-vpc"
+  default_vpc_name                 = "${var.name}-default-vpc"
   default_vpc_enable_dns_hostnames = var.default_vpc_enable_dns_hostnames
 
   tags = var.tags
