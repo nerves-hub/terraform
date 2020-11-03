@@ -4,10 +4,7 @@ resource "aws_security_group" "rds_security_group" {
   description = "${var.identifier}-db-sg"
   vpc_id      = var.vpc_id
 
-  tags = {
-    Environment = terraform.workspace
-    Name = "${var.identifier}-db-sg"
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true
@@ -45,8 +42,5 @@ resource "aws_db_instance" "default" {
     ]
   }
 
-  tags = {
-    Environment = terraform.workspace
-    Name = "${var.identifier}-db"
-  }
+  tags = var.tags
 }

@@ -35,3 +35,11 @@ variable "engine_version" {
 variable "subnet_group" {
   description = "DB subnet group"
 }
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resources"
+  type        = map(string)
+  default = {
+    terraform = true
+  }
+}

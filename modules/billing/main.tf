@@ -6,10 +6,7 @@ resource "aws_security_group" "billing_security_group" {
   description = "nerves-hub-${terraform.workspace}-billing-sg"
   vpc_id      = var.vpc.vpc_id
 
-  tags = {
-    Environment = terraform.workspace
-    Name = "nerves-hub-${terraform.workspace}-billing-sg"
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true
@@ -17,38 +14,38 @@ resource "aws_security_group" "billing_security_group" {
 }
 
 resource "aws_security_group_rule" "billing_security_group_all_egress" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.billing_security_group.id
 }
 
 resource "aws_security_group_rule" "billing_security_group_web_ingress" {
-  type = "ingress"
-  from_port = 8443
-  to_port = 8443
-  protocol = "tcp"
+  type                     = "ingress"
+  from_port                = 8443
+  to_port                  = 8443
+  protocol                 = "tcp"
   source_security_group_id = var.web_security_group.id
-  security_group_id = aws_security_group.billing_security_group.id
+  security_group_id        = aws_security_group.billing_security_group.id
 }
 
 resource "aws_security_group_rule" "db_security_group_billing_ingress" {
-  type = "ingress"
-  from_port = 5432
-  to_port = 5432
-  protocol = "tcp"
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
   source_security_group_id = aws_security_group.billing_security_group.id
-  security_group_id = var.db.security_group.id
+  security_group_id        = var.db.security_group.id
 }
 
 resource "aws_security_group_rule" "db_security_group_billing_egress" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = var.db.security_group.id
 }
 
@@ -89,11 +86,11 @@ resource "aws_ssm_parameter" "nerves_hub_billing_ssm_host" {
 }
 
 resource "aws_s3_bucket_object" "web_application_data_billing" {
-    bucket = "${var.app_bucket}"
-    acl    = "private"
-    key    = "billing/"
-    source = "/dev/null"
-    kms_key_id = "${var.kms_key.arn}"
+  bucket     = var.app_bucket
+  acl        = "private"
+  key        = "billing/"
+  source     = "/dev/null"
+  kms_key_id = var.kms_key.arn
 }
 
 # Roles
@@ -240,12 +237,12 @@ data "aws_iam_policy_document" "billing_iam_policy" {
 
 
 resource "aws_iam_policy" "billing_task_policy" {
-  name = "nerves-hub-${terraform.workspace}-billing-task-policy"
+  name   = "nerves-hub-${terraform.workspace}-billing-task-policy"
   policy = data.aws_iam_policy_document.billing_iam_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "billing_role_policy_attach" {
-  role = aws_iam_role.billing_task_role.name
+  role       = aws_iam_role.billing_task_role.name
   policy_arn = aws_iam_policy.billing_task_policy.arn
 }
 
@@ -256,7 +253,7 @@ resource "aws_service_discovery_service" "billing_service_discovery" {
   name = "billing"
 
   dns_config {
-    namespace_id = "${var.local_dns_namespace.id}"
+    namespace_id = var.local_dns_namespace.id
 
     dns_records {
       ttl  = 10
@@ -273,14 +270,17 @@ resource "aws_service_discovery_service" "billing_service_discovery" {
 
 # ECS
 resource "aws_ecs_task_definition" "billing_task_definition" {
-  family = "nerves-hub-${terraform.workspace}-billing"
-  task_role_arn = aws_iam_role.billing_task_role.arn
+  family             = "nerves-hub-${terraform.workspace}-billing"
+  task_role_arn      = aws_iam_role.billing_task_role.arn
   execution_role_arn = var.task_execution_role.arn
+  propagate_tags     = "TASK_DEFINITION"
 
-  network_mode = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu = "256"
-  memory = "512"
+  cpu                      = "256"
+  memory                   = "512"
+
+  tags = var.tags
 
   container_definitions = <<DEFINITION
    [
@@ -328,10 +328,11 @@ resource "aws_ecs_service" "billing_ecs_service" {
 
   task_definition = aws_ecs_task_definition.billing_task_definition.arn
   desired_count   = var.service_count
+  propagate_tags  = "TASK_DEFINITION"
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
-  launch_type = "FARGATE"
+  launch_type                        = "FARGATE"
 
   network_configuration {
     security_groups = [aws_security_group.billing_security_group.id]
@@ -347,7 +348,9 @@ resource "aws_ecs_service" "billing_ecs_service" {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
 
-  depends_on      = [
+  tags = var.tags
+
+  depends_on = [
     aws_iam_role.billing_task_role
   ]
 }

@@ -6,10 +6,7 @@ resource "aws_security_group" "ca_security_group" {
   description = "nerves-hub-${terraform.workspace}-ca-sg"
   vpc_id      = var.vpc.vpc_id
 
-  tags = {
-    Environment = terraform.workspace
-    Name = "nerves-hub-${terraform.workspace}-ca-sg"
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true
@@ -17,38 +14,38 @@ resource "aws_security_group" "ca_security_group" {
 }
 
 resource "aws_security_group_rule" "ca_security_group_all_egress" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ca_security_group.id
 }
 
 resource "aws_security_group_rule" "ca_security_group_web_ingress" {
-  type = "ingress"
-  from_port = 8443
-  to_port = 8443
-  protocol = "tcp"
+  type                     = "ingress"
+  from_port                = 8443
+  to_port                  = 8443
+  protocol                 = "tcp"
   source_security_group_id = var.web_security_group.id
-  security_group_id = aws_security_group.ca_security_group.id
+  security_group_id        = aws_security_group.ca_security_group.id
 }
 
 resource "aws_security_group_rule" "db_security_group_ca_ingress" {
-  type = "ingress"
-  from_port = 5432
-  to_port = 5432
-  protocol = "tcp"
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
   source_security_group_id = aws_security_group.ca_security_group.id
-  security_group_id = var.db.security_group.id
+  security_group_id        = var.db.security_group.id
 }
 
 resource "aws_security_group_rule" "db_security_group_ca_egress" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = var.db.security_group.id
 }
 
@@ -65,15 +62,13 @@ resource "aws_s3_bucket" "ca_application_data" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = "${var.kms_key.arn}"
+        kms_master_key_id = var.kms_key.arn
         sse_algorithm     = "aws:kms"
       }
     }
   }
 
-  tags = {
-    Origin = "Terraform"
-  }
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_public_access_block" "ca_application_data" {
@@ -88,11 +83,11 @@ resource "aws_s3_bucket_public_access_block" "ca_application_data" {
 }
 
 resource "aws_s3_bucket_object" "ca_application_data_ssl" {
-  bucket = "${aws_s3_bucket.ca_application_data.id}"
-  acl    = "private"
-  key    = "ssl/"
-  source = "/dev/null"
-  kms_key_id = "${var.kms_key.arn}"
+  bucket     = aws_s3_bucket.ca_application_data.id
+  acl        = "private"
+  key        = "ssl/"
+  source     = "/dev/null"
+  kms_key_id = var.kms_key.arn
 
   depends_on = [
     aws_s3_bucket.ca_application_data
@@ -268,12 +263,12 @@ data "aws_iam_policy_document" "ca_iam_policy" {
 
 
 resource "aws_iam_policy" "ca_task_policy" {
-  name = "nerves-hub-${terraform.workspace}-ca-task-policy"
+  name   = "nerves-hub-${terraform.workspace}-ca-task-policy"
   policy = data.aws_iam_policy_document.ca_iam_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "ca_role_policy_attach" {
-  role = aws_iam_role.ca_task_role.name
+  role       = aws_iam_role.ca_task_role.name
   policy_arn = aws_iam_policy.ca_task_policy.arn
 }
 
@@ -282,7 +277,7 @@ resource "aws_service_discovery_service" "ca_service_discovery" {
   name = "ca"
 
   dns_config {
-    namespace_id = "${var.local_dns_namespace.id}"
+    namespace_id = var.local_dns_namespace.id
 
     dns_records {
       ttl  = 10
@@ -299,14 +294,16 @@ resource "aws_service_discovery_service" "ca_service_discovery" {
 
 # ECS
 resource "aws_ecs_task_definition" "ca_task_definition" {
-  family = "nerves-hub-${terraform.workspace}-ca"
-  task_role_arn = aws_iam_role.ca_task_role.arn
+  family             = "nerves-hub-${terraform.workspace}-ca"
+  task_role_arn      = aws_iam_role.ca_task_role.arn
   execution_role_arn = var.task_execution_role.arn
 
-  network_mode = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu = "256"
-  memory = "512"
+  cpu                      = "256"
+  memory                   = "512"
+
+  tags = var.tags
 
   container_definitions = <<DEFINITION
    [
@@ -354,10 +351,11 @@ resource "aws_ecs_service" "ca_ecs_service" {
 
   task_definition = aws_ecs_task_definition.ca_task_definition.arn
   desired_count   = var.service_count
+  propagate_tags  = "TASK_DEFINITION"
 
   deployment_minimum_healthy_percent = "100"
   deployment_maximum_percent         = "200"
-  launch_type = "FARGATE"
+  launch_type                        = "FARGATE"
 
   network_configuration {
     security_groups = [aws_security_group.ca_security_group.id]
@@ -373,7 +371,9 @@ resource "aws_ecs_service" "ca_ecs_service" {
     ignore_changes = [task_definition] # create_before_destroy = true
   }
 
-  depends_on      = [
+  tags = var.tags
+
+  depends_on = [
     aws_iam_role.ca_task_role
   ]
 }

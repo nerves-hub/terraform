@@ -14,7 +14,7 @@ module "vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Owner       =  "nerves-hub-${terraform.workspace}"
-    Environment = "${terraform.workspace}"
+    Owner       = "nerves-hub-${terraform.workspace}"
+    Environment = terraform.workspace
   }
 }

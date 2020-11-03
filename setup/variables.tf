@@ -35,11 +35,11 @@ variable "db_allocated_storage" {
 
 variable "db_instance_class" {
   description = "The Instance class of the Postgres database server"
-  default = "db.t2.small"
+  default     = "db.t2.small"
 }
 variable "db_engine_version" {
   description = "The Engine version of the Postgres database server"
-  default = "11.4"
+  default     = "11.4"
 }
 
 variable "bucket_prefix" {
@@ -52,22 +52,22 @@ variable "erl_cookie" {
 
 variable "ca_service_desired_count" {
   description = "The number of NervesHubCA containers to run"
-  default = "1"
+  default     = "1"
 }
 
 variable "ca_image" {
   description = "The docker image of the nerves_hub_ca app"
-  default = "nerveshub/nerves_hub_ca:latest"
+  default     = "nerveshub/nerves_hub_ca:latest"
 }
 
 variable "ca_db_name" {
   description = "The name of the CA database"
-  default = "nerves_hub_ca"
+  default     = "nerves_hub_ca"
 }
 
 variable "log_retention" {
   description = "Cloud watch log retention days"
-  default = 90
+  default     = 90
 }
 
 variable "domain" {
@@ -76,7 +76,7 @@ variable "domain" {
 
 variable "web_db_name" {
   description = "The name of the web database"
-  default = "nerves_hub_web"
+  default     = "nerves_hub_web"
 }
 
 variable "web_secret_key_base" {
@@ -93,12 +93,12 @@ variable "web_smtp_password" {
 
 variable "www_image" {
   description = "The docker image of the nerves_hub_www app"
-  default = "nerveshub/nerves_hub_www:latest"
+  default     = "nerveshub/nerves_hub_www:latest"
 }
 
 variable "www_service_desired_count" {
   description = "The number of NervesHubWWW containers to run"
-  default = "1"
+  default     = "1"
 }
 
 variable "www_live_view_signing_salt" {
@@ -107,40 +107,40 @@ variable "www_live_view_signing_salt" {
 
 variable "device_image" {
   description = "The docker image of the nerves_hub_device app"
-  default = "nerveshub/nerves_hub_device:latest"
+  default     = "nerveshub/nerves_hub_device:latest"
 }
 
 variable "device_service_desired_count" {
   description = "The number of NervesHubDevice containers to run"
-  default = "1"
+  default     = "1"
 }
 
 variable "api_image" {
   description = "The docker image of the nerves_hub_api app"
-  default = "nerveshub/nerves_hub_api:latest"
+  default     = "nerveshub/nerves_hub_api:latest"
 }
 
 variable "api_service_desired_count" {
   description = "The number of NervesHubAPI containers to run"
-  default = "1"
+  default     = "1"
 }
 
 variable "whitelist" {
   description = "The whitelisted IPs for accessing the cluster"
-  default = ["0.0.0.0/0"]
+  default     = ["0.0.0.0/0"]
 }
 
 variable "billing_enabled" {
   description = "Enable billing?"
-  default = false
+  default     = false
 }
 
 variable "billing_image" {
   description = "The docker image of the nerves_hub_billing app"
-  default = "nerveshub/nerves_hub_billing:latest"
+  default     = "nerveshub/nerves_hub_billing:latest"
 }
 
 variable "billing_service_desired_count" {
   description = "The number of NervesHubBilling containers to run"
-  default = "1"
+  default     = "1"
 }
