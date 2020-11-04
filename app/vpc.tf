@@ -9,7 +9,7 @@ locals {
 module "vpc" {
   source               = "../modules/vpc/"
   name                 = "nerves-hub-${terraform.workspace}"
-  subnet               = local.subnet
+  subnet               = local.subnet[terraform.workspace]
   enable_dhcp_options  = true
   enable_dns_hostnames = true
 

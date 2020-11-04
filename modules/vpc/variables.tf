@@ -9,12 +9,11 @@ variable "tags" {
 variable "name" {
   description = "The application name"
   type        = string
-  default     = "nerves-hub"
 }
 
 variable "subnet" {
   description = "The second octet in the address to use for the subnet"
-  type = map(string)
+  type = string
 }
 
 variable "azs" {

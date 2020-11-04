@@ -3,12 +3,12 @@ module "vpc" {
   version = "~> 2.63"
 
   name = var.name
-  cidr = "10.${var.subnet[terraform.workspace]}.0.0/16"
+  cidr = "10.${var.subnet}.0.0/16"
 
   azs                 = var.azs
-  private_subnets     = ["10.${var.subnet[terraform.workspace]}.1.0/24", "10.${var.subnet[terraform.workspace]}.2.0/24", "10.${var.subnet[terraform.workspace]}.3.0/24"]
-  public_subnets      = ["10.${var.subnet[terraform.workspace]}.11.0/24", "10.${var.subnet[terraform.workspace]}.12.0/24", "10.${var.subnet[terraform.workspace]}.13.0/24"]
-  database_subnets    = ["10.${var.subnet[terraform.workspace]}.21.0/24", "10.${var.subnet[terraform.workspace]}.22.0/24", "10.${var.subnet[terraform.workspace]}.23.0/24"]
+  private_subnets     = ["10.${var.subnet}.1.0/24", "10.${var.subnet}.2.0/24", "10.${var.subnet}.3.0/24"]
+  public_subnets      = ["10.${var.subnet}.101.0/24", "10.${var.subnet}.102.0/24", "10.${var.subnet}.103.0/24"]
+  database_subnets    = ["10.${var.subnet}.201.0/24", "10.${var.subnet}.202.0/24", "10.${var.subnet}.203.0/24"]
 
   create_database_subnet_group     = var.create_database_subnet_group
   enable_nat_gateway               = var.enable_nat_gateway
