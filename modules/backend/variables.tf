@@ -19,3 +19,15 @@ variable "tags" {
     terraform = true
   }
 }
+
+variable "s3_access_log_bucket" {
+  type        = string
+  description = "What bucket to write access logs to"
+  default     = ""
+}
+
+variable "s3_prefix" {
+  type        = string
+  description = "S3 bucket name prefix"
+  default     = ""
+}
