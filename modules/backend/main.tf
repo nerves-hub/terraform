@@ -39,6 +39,11 @@ resource "aws_s3_bucket" "terraform_state" {
     }
   }
 
+  logging {
+    target_bucket = var.s3_access_log_bucket
+    target_prefix = var.s3_prefix
+  }
+
   tags = var.tags
 }
 
