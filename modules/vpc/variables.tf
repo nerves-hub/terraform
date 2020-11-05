@@ -11,9 +11,24 @@ variable "name" {
   type        = string
 }
 
-variable "subnet" {
-  description = "The second octet in the address to use for the subnet"
+variable "cidr" {
+  description = "The CIDR block for the vpc"
   type = string
+}
+
+variable "public_subnets" {
+  description = "A list of public subnets inside the VPC"
+  type        = list(string)
+}
+
+variable "private_subnets" {
+  description = "A list of private subnets inside the VPC"
+  type        = list(string)
+}
+
+variable "database_subnets" {
+  description = "A list of database subnets"
+  type        = list(string)
 }
 
 variable "azs" {
