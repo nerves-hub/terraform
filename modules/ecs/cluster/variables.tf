@@ -33,3 +33,27 @@ variable "tags" {
     terraform = true
   }
 }
+
+variable "app_name" {
+  description = "Name of the app"
+  type        = string
+  default     = ""
+}
+
+variable "current_account_id" {
+  description = "The AWS account number where the ecs cluster is"
+  type        = string
+  default     = ""
+}
+
+variable "role_name" {
+  description = "The name of the role for ECS"
+  type        = string
+  default     = "ECSRuntimeRole"
+}
+
+variable "kms_key_arn" {
+  description = "The arn of the kms key"
+  type        = string
+  default     = ""
+}

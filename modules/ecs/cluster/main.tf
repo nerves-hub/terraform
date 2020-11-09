@@ -4,23 +4,45 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = var.tags
 }
 
-resource "aws_iam_role_policy" "ecs_instance_role_policy" {
-  name   = "ecs-instance-role-policy-${var.environment}"
-  policy = file("${path.module}/templates/ecs-instance-role-policy.json")
-  role   = aws_iam_role.ecs_role.id
+#resource "aws_iam_role_policy" "ecs_instance_role_policy" {
+#  name   = "ecs-instance-role-policy-${var.environment}"
+#  policy = file("${path.module}/templates/ecs-instance-role-policy.json")
+#  role   = aws_iam_role.ecs_role.id
+#}
+#
+#resource "aws_iam_role" "ecs_role" {
+#  name               = "ecs-instance-role-${var.environment}"
+#  assume_role_policy = file("${path.module}/templates/ecs-role.json")
+#}
+#
+#resource "aws_iam_instance_profile" "ecs_instance_profile" {
+#  name = "ecs-instance-profile-${var.environment}"
+#  path = "/"
+#  role = aws_iam_role.ecs_role.name
+#}
+
+
+
+resource "aws_iam_role" "ecs_runtime" {
+  name               = "${var.app_name}-${var.role_name}"
+  assume_role_policy = data.aws_iam_policy_document.assume_ecs_role.json
+
+  tags = var.tags
 }
 
-resource "aws_iam_role" "ecs_role" {
-  name               = "ecs-instance-role-${var.environment}"
-  assume_role_policy = file("${path.module}/templates/ecs-role.json")
-}
+data "aws_iam_policy_document" "assume_ecs_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
 
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecs-instance-profile-${var.environment}"
-  path = "/"
-  role = aws_iam_role.ecs_role.name
+    principals {
+      identifiers = ["ecs-tasks.amazonaws.com", "ecs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
 }
 
 # This is created for all load balancers in the cluster, so we can whitelist
@@ -30,6 +52,32 @@ resource "aws_security_group" "lb_security_group" {
   description = "${aws_ecs_cluster.ecs_cluster.name} load balancers"
   vpc_id      = var.aws_vpc_id
 
+  ingress {
+    protocol  = "tcp"
+    from_port = 80
+    to_port   = 80
+
+    cidr_blocks = [element(var.whitelist, count.index)]
+  }
+
+  ingress {
+    protocol  = "tcp"
+    from_port = 443
+    to_port   = 443
+
+    cidr_blocks = [element(var.whitelist, count.index)]
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
+
   tags = var.tags
 
   lifecycle {
@@ -37,36 +85,81 @@ resource "aws_security_group" "lb_security_group" {
   }
 }
 
-resource "aws_security_group_rule" "lb_security_group_all_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.lb_security_group.id
+data "aws_iam_policy_document" "ecs_runtime" {
+  statement {
+    actions = [
+      "kms:Decrypt",
+    ]
+
+    resources = [
+      var.kms_key_arn,
+    ]
+  }
+
+  statement {
+    actions = [
+      "logs:PutLogEvents",
+      "logs:CreateLogStream",
+    ]
+
+    resources = [
+      aws_cloudwatch_log_group.app.arn,
+      "${aws_cloudwatch_log_group.app.arn}:*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "ssm:GetParameters",
+    ]
+
+    resources = [
+      "arn:aws:ssm:${var.aws_region}:${var.current_account_id}:parameter/${var.app_name}/*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "ecs:ListClusters",
+      "ecs:ListContainerInstances",
+      "ecs:DescribeContainerInstances",
+    ]
+    resources = [
+      aws_ecs_cluster.ecs_cluster.arn,
+    ]
+  }
 }
 
-resource "aws_security_group_rule" "lb_security_group_cluster_http_ingress" {
-  count             = length(var.whitelist)
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = [element(var.whitelist, count.index)]
-  security_group_id = aws_security_group.lb_security_group.id
-  description       = "${element(var.whitelist, count.index)} Access"
-}
-
-resource "aws_security_group_rule" "lb_security_group_cluster_https_ingress" {
-  count             = length(var.whitelist)
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = [element(var.whitelist, count.index)]
-  security_group_id = aws_security_group.lb_security_group.id
-  description       = "${element(var.whitelist, count.index)} Access"
-}
+#resource "aws_security_group_rule" "lb_security_group_all_egress" {
+#  type              = "egress"
+#  from_port         = 0
+#  to_port           = 0
+#  protocol          = "-1"
+#  cidr_blocks       = ["0.0.0.0/0"]
+#  security_group_id = aws_security_group.lb_security_group.id
+#}
+#
+#resource "aws_security_group_rule" "lb_security_group_cluster_http_ingress" {
+#  count             = length(var.whitelist)
+#  type              = "ingress"
+#  from_port         = 80
+#  to_port           = 80
+#  protocol          = "tcp"
+#  cidr_blocks       = [element(var.whitelist, count.index)]
+#  security_group_id = aws_security_group.lb_security_group.id
+#  description       = "${element(var.whitelist, count.index)} Access"
+#}
+#
+#resource "aws_security_group_rule" "lb_security_group_cluster_https_ingress" {
+#  count             = length(var.whitelist)
+#  type              = "ingress"
+#  from_port         = 443
+#  to_port           = 443
+#  protocol          = "tcp"
+#  cidr_blocks       = [element(var.whitelist, count.index)]
+#  security_group_id = aws_security_group.lb_security_group.id
+#  description       = "${element(var.whitelist, count.index)} Access"
+#}
 
 resource "aws_cloudwatch_log_group" "app" {
   name              = aws_ecs_cluster.ecs_cluster.name
