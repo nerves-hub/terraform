@@ -1,3 +1,9 @@
+locals {
+  current_account_id = data.aws_caller_identity.current.account_id
+}
+
+data "aws_caller_identity" "current" {}
+
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "nerves-hub-${var.environment}"
 
@@ -95,7 +101,7 @@ data "aws_iam_policy_document" "ecs_runtime" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.aws_region}:${var.current_account_id}:parameter/${var.app_name}/*",
+      "arn:aws:ssm:${var.aws_region}:${local.current_account_id}:parameter/${var.app_name}/*",
     ]
   }
 

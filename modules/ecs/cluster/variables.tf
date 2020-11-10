@@ -37,13 +37,6 @@ variable "tags" {
 variable "app_name" {
   description = "Name of the app"
   type        = string
-  default     = ""
-}
-
-variable "current_account_id" {
-  description = "The AWS account number where the ecs cluster is"
-  type        = string
-  default     = ""
 }
 
 variable "role_name" {
@@ -55,5 +48,4 @@ variable "role_name" {
 variable "kms_key_arn" {
   description = "The arn of the kms key"
   type        = string
-  default     = ""
 }
