@@ -14,24 +14,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   tags = var.tags
 }
 
-resource "aws_iam_role" "ecs_runtime" {
-  name               = "${var.app_name}-${var.role_name}"
-  assume_role_policy = data.aws_iam_policy_document.assume_ecs_role.json
-
-  tags = var.tags
-}
-
-data "aws_iam_policy_document" "assume_ecs_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      identifiers = ["ecs-tasks.amazonaws.com", "ecs.amazonaws.com"]
-      type        = "Service"
-    }
-  }
-}
-
 # This is created for all load balancers in the cluster, so we can whitelist
 # inbound from these load balancers on the instance security group
 resource "aws_security_group" "lb_security_group" {
