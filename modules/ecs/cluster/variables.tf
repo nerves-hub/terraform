@@ -39,11 +39,6 @@ variable "app_name" {
   type        = string
 }
 
-variable "role_name" {
-  description = "The name of the role for ECS"
-  type        = string
-  default     = "ECSRuntimeRole"
-}
 
 variable "kms_key_arn" {
   description = "The arn of the kms key"

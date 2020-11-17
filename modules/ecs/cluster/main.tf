@@ -54,51 +54,6 @@ resource "aws_security_group" "lb_security_group" {
   }
 }
 
-data "aws_iam_policy_document" "ecs_runtime" {
-  statement {
-    actions = [
-      "kms:Decrypt",
-    ]
-
-    resources = [
-      var.kms_key_arn,
-    ]
-  }
-
-  statement {
-    actions = [
-      "logs:PutLogEvents",
-      "logs:CreateLogStream",
-    ]
-
-    resources = [
-      aws_cloudwatch_log_group.app.arn,
-      "${aws_cloudwatch_log_group.app.arn}:*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "ssm:GetParameters",
-    ]
-
-    resources = [
-      "arn:aws:ssm:${var.aws_region}:${local.current_account_id}:parameter/${var.app_name}/*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "ecs:ListClusters",
-      "ecs:ListContainerInstances",
-      "ecs:DescribeContainerInstances",
-    ]
-    resources = [
-      aws_ecs_cluster.ecs_cluster.arn,
-    ]
-  }
-}
-
 resource "aws_cloudwatch_log_group" "app" {
   name              = aws_ecs_cluster.ecs_cluster.name
   retention_in_days = terraform.workspace == "staging" ? 1 : var.log_retention
