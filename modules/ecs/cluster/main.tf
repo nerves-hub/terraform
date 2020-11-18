@@ -1,26 +1,17 @@
+locals {
+  current_account_id = data.aws_caller_identity.current.account_id
+}
+
+data "aws_caller_identity" "current" {}
+
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "nerves-hub-${var.environment}"
 
   lifecycle {
     create_before_destroy = true
   }
-}
 
-resource "aws_iam_role_policy" "ecs_instance_role_policy" {
-  name   = "ecs-instance-role-policy-${var.environment}"
-  policy = file("${path.module}/templates/ecs-instance-role-policy.json")
-  role   = aws_iam_role.ecs_role.id
-}
-
-resource "aws_iam_role" "ecs_role" {
-  name               = "ecs-instance-role-${var.environment}"
-  assume_role_policy = file("${path.module}/templates/ecs-role.json")
-}
-
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecs-instance-profile-${var.environment}"
-  path = "/"
-  role = aws_iam_role.ecs_role.name
+  tags = var.tags
 }
 
 # This is created for all load balancers in the cluster, so we can whitelist
@@ -30,42 +21,37 @@ resource "aws_security_group" "lb_security_group" {
   description = "${aws_ecs_cluster.ecs_cluster.name} load balancers"
   vpc_id      = var.aws_vpc_id
 
+  ingress {
+    protocol  = "tcp"
+    from_port = 80
+    to_port   = 80
+
+    cidr_blocks = [element(var.whitelist, count.index)]
+  }
+
+  ingress {
+    protocol  = "tcp"
+    from_port = 443
+    to_port   = 443
+
+    cidr_blocks = [element(var.whitelist, count.index)]
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
+
   tags = var.tags
 
   lifecycle {
     create_before_destroy = true
   }
-}
-
-resource "aws_security_group_rule" "lb_security_group_all_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.lb_security_group.id
-}
-
-resource "aws_security_group_rule" "lb_security_group_cluster_http_ingress" {
-  count             = length(var.whitelist)
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = [element(var.whitelist, count.index)]
-  security_group_id = aws_security_group.lb_security_group.id
-  description       = "${element(var.whitelist, count.index)} Access"
-}
-
-resource "aws_security_group_rule" "lb_security_group_cluster_https_ingress" {
-  count             = length(var.whitelist)
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = [element(var.whitelist, count.index)]
-  security_group_id = aws_security_group.lb_security_group.id
-  description       = "${element(var.whitelist, count.index)} Access"
 }
 
 resource "aws_cloudwatch_log_group" "app" {
