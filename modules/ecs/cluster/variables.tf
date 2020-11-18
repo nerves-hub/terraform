@@ -33,14 +33,3 @@ variable "tags" {
     terraform = true
   }
 }
-
-variable "app_name" {
-  description = "Name of the app"
-  type        = string
-}
-
-
-variable "kms_key_arn" {
-  description = "The arn of the kms key"
-  type        = string
-}
