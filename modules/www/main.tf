@@ -88,6 +88,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_db_url" {
   type      = "SecureString"
   value     = "postgres://${var.db.username}:${var.db.password}@${var.db.endpoint}/${var.db.name}"
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_live_view_signing_salt" {
@@ -95,6 +96,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_live_view_signing_salt" 
   type      = "SecureString"
   value     = var.live_view_signing_salt
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_erl_cookie" {
@@ -102,6 +104,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_erl_cookie" {
   type      = "SecureString"
   value     = var.erl_cookie
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_ssl_bucket" {
@@ -109,6 +112,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_ssl_bucket" {
   type      = "String"
   value     = var.ca_bucket
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_app_name" {
@@ -116,6 +120,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_app_name" {
   type      = "String"
   value     = "nerves_hub_www"
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_cluster" {
@@ -123,6 +128,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_cluster" {
   type      = "String"
   value     = var.cluster.name
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_aws_region" {
@@ -130,6 +136,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_aws_region" {
   type      = "String"
   value     = var.region
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_port" {
@@ -137,6 +144,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_port" {
   type      = "String"
   value     = 80
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_host" {
@@ -144,6 +152,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_host" {
   type      = "String"
   value     = "www.${terraform.workspace}.${var.domain}"
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_bucket_name" {
@@ -151,6 +160,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_bucket_name" {
   type      = "String"
   value     = var.app_bucket
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_log_bucket_name" {
@@ -158,6 +168,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_s3_log_bucket_name" {
   type      = "String"
   value     = var.log_bucket
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_secret_key_base" {
@@ -165,6 +176,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_secret_key_base" {
   type      = "SecureString"
   value     = var.secret_key_base
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_port" {
@@ -172,6 +184,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_port" {
   type      = "String"
   value     = "587"
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_server" {
@@ -179,6 +192,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_server" {
   type      = "String"
   value     = "email-smtp.${var.region}.amazonaws.com"
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_smtp_username" {
@@ -186,6 +200,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_smtp_username" {
   type      = "SecureString"
   value     = var.smtp_password
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_smtp_password" {
@@ -193,6 +208,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_smtp_password" {
   type      = "SecureString"
   value     = var.smtp_username
   overwrite = true
+  tags      = var.tags
 }
 
 # Roles
@@ -215,7 +231,7 @@ resource "aws_iam_role" "www_task_role" {
   ]
 }
 EOF
-
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "www_iam_policy" {
