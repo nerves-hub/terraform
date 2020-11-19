@@ -31,29 +31,10 @@ resource "aws_security_group_rule" "ca_security_group_web_ingress" {
   security_group_id        = aws_security_group.ca_security_group.id
 }
 
-resource "aws_security_group_rule" "db_security_group_ca_ingress" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.ca_security_group.id
-  security_group_id        = var.db.security_group.id
-}
-
-resource "aws_security_group_rule" "db_security_group_ca_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = var.db.security_group.id
-}
-
-
 # Storage
 resource "aws_s3_bucket" "ca_application_data" {
   bucket = "${var.bucket_prefix}-${terraform.workspace}-ca"
-  acl    = "private"
+  acl = "private"
 
   versioning {
     enabled = false
@@ -63,7 +44,7 @@ resource "aws_s3_bucket" "ca_application_data" {
     rule {
       apply_server_side_encryption_by_default {
         kms_master_key_id = var.kms_key.arn
-        sse_algorithm     = "aws:kms"
+        sse_algorithm = "aws:kms"
       }
     }
   }
@@ -72,7 +53,8 @@ resource "aws_s3_bucket" "ca_application_data" {
     target_bucket = var.s3_access_log_bucket
     target_prefix = var.s3_prefix
 
-  tags = var.tags
+    tags = var.tags
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "ca_application_data" {

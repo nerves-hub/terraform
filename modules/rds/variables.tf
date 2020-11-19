@@ -43,3 +43,11 @@ variable "tags" {
     terraform = true
   }
 }
+
+variable "security_groups" {
+  default = [""]
+}
+
+variable "cidr_blocks" {
+  default = [""]
+}

@@ -1,8 +1,39 @@
 # RDS instance security group
 resource "aws_security_group" "rds_security_group" {
   name        = "${var.identifier}-db-sg"
-  description = "${var.identifier}-db-sg"
+  description = "Database security group for ${var.identifier}"
   vpc_id      = var.vpc_id
+
+  dynamic "ingress" {
+    for_each = var.security_groups != [""] ? [var.security_groups] : []
+    content {
+      from_port = 5432
+      protocol = "tcp"
+      to_port = 5432
+      security_groups = flatten([
+        ingress.value
+      ])
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = var.cidr_blocks != [""] ? [var.cidr_blocks] : []
+    content {
+      from_port = 5432
+      protocol = "tcp"
+      to_port = 5432
+      cidr_blocks = flatten([
+        ingress.value
+      ])
+    }
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   tags = var.tags
 

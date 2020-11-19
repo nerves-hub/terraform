@@ -115,24 +115,7 @@ module "web_db" {
   engine_version    = var.db_engine_version
   vpc_id            = module.vpc.vpc_id
   kms_key           = aws_kms_key.db_enc_key.arn
-}
-
-resource "aws_security_group_rule" "db_security_group_web_ingress" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.web_security_group.id
-  security_group_id        = module.web_db.security_group.id
-}
-
-resource "aws_security_group_rule" "db_security_group_web_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = module.web_db.security_group.id
+  security_groups   = aws_security_group.web_security_group.id
 }
 
 # Storage
@@ -221,6 +204,7 @@ module "ca_db" {
   engine_version    = var.db_engine_version
   vpc_id            = module.vpc.vpc_id
   kms_key           = aws_kms_key.db_enc_key.arn
+  security_groups   = module.ca.security_group
 }
 
 module "ca" {
