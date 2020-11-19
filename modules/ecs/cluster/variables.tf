@@ -26,6 +26,11 @@ variable "allow_list" {
   description = "IPs that are allowed to access the cluster from load balancers"
 }
 
+variable "settings" {
+  description = "ECS cluster settings"
+  default     = ""
+}
+
 variable "tags" {
   description = "A mapping of tags to assign to the resources"
   type        = map(string)

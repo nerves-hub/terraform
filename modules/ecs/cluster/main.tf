@@ -7,6 +7,14 @@ data "aws_caller_identity" "current" {}
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "nerves-hub-${var.environment}"
 
+  dynamic "setting" {
+    for_each = var.settings == "containerInsights" ? [var.settings] : []
+    content {
+      name  = setting.value
+      value = enabled
+    }
+  }
+
   lifecycle {
     create_before_destroy = true
   }
