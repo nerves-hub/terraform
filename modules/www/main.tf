@@ -393,7 +393,7 @@ resource "aws_ecs_task_definition" "www_task_definition" {
          "logDriver": "awslogs",
          "options": {
            "awslogs-region": "${var.region}",
-           "awslogs-group": "${var.cluster.log_group}",
+           "awslogs-group": "${var.cluster.log_group_name}",
            "awslogs-stream-prefix": "nerves_hub_www"
          }
        }
