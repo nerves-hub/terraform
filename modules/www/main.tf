@@ -80,8 +80,6 @@ resource "aws_lb_listener" "www_ssl_lb_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.www_lb_tg.arn
   }
-
-  tags = var.tags
 }
 
 # SSM
