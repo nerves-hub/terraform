@@ -10,6 +10,10 @@ output "arn" {
   value = aws_ecs_cluster.ecs_cluster.arn
 }
 
-output "log_group" {
+output "log_group_name" {
   value = aws_cloudwatch_log_group.app.name
+}
+
+output "log_group_arn" {
+  value = aws_cloudwatch_log_group.app.arn
 }

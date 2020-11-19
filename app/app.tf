@@ -217,7 +217,7 @@ module "ca" {
   vpc       = module.vpc
   cluster   = module.ecs_cluster
   db        = module.ca_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   task_execution_role = aws_iam_role.ecs_tasks_execution_role
   docker_image        = var.ca_image
@@ -246,7 +246,7 @@ module "www" {
   task_security_group_id = aws_security_group.web_security_group.id
 
   db        = module.web_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   erl_cookie             = var.erl_cookie
   live_view_signing_salt = var.www_live_view_signing_salt
@@ -277,7 +277,7 @@ module "api" {
   task_security_group_id = aws_security_group.web_security_group.id
 
   db        = module.web_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   erl_cookie      = var.erl_cookie
   app_bucket      = aws_s3_bucket.web_application_data.bucket
@@ -308,7 +308,7 @@ module "device" {
   task_security_group_id = aws_security_group.web_security_group.id
 
   db        = module.web_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   erl_cookie      = var.erl_cookie
   app_bucket      = aws_s3_bucket.web_application_data.bucket
