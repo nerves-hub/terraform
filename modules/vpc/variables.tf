@@ -13,7 +13,7 @@ variable "name" {
 
 variable "cidr" {
   description = "The CIDR block for the vpc"
-  type = string
+  type        = string
 }
 
 variable "public_subnets" {
@@ -33,7 +33,7 @@ variable "database_subnets" {
 
 variable "azs" {
   description = "A list of availability zones names or ids in the region"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "create_database_subnet_group" {

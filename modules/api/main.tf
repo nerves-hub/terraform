@@ -212,7 +212,7 @@ resource "aws_iam_role" "api_task_role" {
   ]
 }
 EOF
-  tags = var.tags
+  tags               = var.tags
 }
 
 data "aws_iam_policy_document" "api_iam_policy" {

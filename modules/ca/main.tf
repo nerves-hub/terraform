@@ -34,7 +34,7 @@ resource "aws_security_group_rule" "ca_security_group_web_ingress" {
 # Storage
 resource "aws_s3_bucket" "ca_application_data" {
   bucket = "${var.bucket_prefix}-${terraform.workspace}-ca"
-  acl = "private"
+  acl    = "private"
 
   versioning {
     enabled = false
@@ -44,7 +44,7 @@ resource "aws_s3_bucket" "ca_application_data" {
     rule {
       apply_server_side_encryption_by_default {
         kms_master_key_id = var.kms_key.arn
-        sse_algorithm = "aws:kms"
+        sse_algorithm     = "aws:kms"
       }
     }
   }
@@ -149,7 +149,7 @@ resource "aws_iam_role" "ca_task_role" {
   ]
 }
 EOF
-  tags = var.tags
+  tags               = var.tags
 }
 
 data "aws_iam_policy_document" "ca_iam_policy" {

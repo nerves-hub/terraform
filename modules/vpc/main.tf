@@ -5,10 +5,10 @@ module "vpc" {
   name = var.name
   cidr = var.cidr
 
-  azs                 = var.azs
-  private_subnets     = var.private_subnets
-  public_subnets      = var.public_subnets
-  database_subnets    = var.database_subnets
+  azs              = var.azs
+  private_subnets  = var.private_subnets
+  public_subnets   = var.public_subnets
+  database_subnets = var.database_subnets
 
   create_database_subnet_group     = var.create_database_subnet_group
   enable_nat_gateway               = var.enable_nat_gateway

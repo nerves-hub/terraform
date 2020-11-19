@@ -8,8 +8,8 @@ resource "aws_security_group" "rds_security_group" {
     for_each = var.security_groups != [""] ? [var.security_groups] : []
     content {
       from_port = 5432
-      protocol = "tcp"
-      to_port = 5432
+      protocol  = "tcp"
+      to_port   = 5432
       security_groups = flatten([
         ingress.value
       ])
@@ -20,8 +20,8 @@ resource "aws_security_group" "rds_security_group" {
     for_each = var.cidr_blocks != [""] ? [var.cidr_blocks] : []
     content {
       from_port = 5432
-      protocol = "tcp"
-      to_port = 5432
+      protocol  = "tcp"
+      to_port   = 5432
       cidr_blocks = flatten([
         ingress.value
       ])

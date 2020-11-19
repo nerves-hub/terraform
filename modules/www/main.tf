@@ -231,7 +231,7 @@ resource "aws_iam_role" "www_task_role" {
   ]
 }
 EOF
-  tags = var.tags
+  tags               = var.tags
 }
 
 data "aws_iam_policy_document" "www_iam_policy" {
