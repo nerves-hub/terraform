@@ -52,9 +52,8 @@ resource "aws_s3_bucket" "ca_application_data" {
   logging {
     target_bucket = var.s3_access_log_bucket
     target_prefix = var.s3_prefix
-
-    tags = var.tags
   }
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_public_access_block" "ca_application_data" {

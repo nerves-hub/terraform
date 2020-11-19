@@ -22,7 +22,7 @@ variable "log_retention" {
   description = "Cloud watch log retention days"
 }
 
-variable "whitelist" {
+variable "allow_list" {
   description = "IPs that are allowed to access the cluster from load balancers"
 }
 
