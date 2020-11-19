@@ -11,7 +11,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
     for_each = var.settings == "containerInsights" ? [var.settings] : []
     content {
       name  = setting.value
-      value = enabled
+      value = "enabled"
     }
   }
 
