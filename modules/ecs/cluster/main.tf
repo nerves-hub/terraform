@@ -26,7 +26,7 @@ resource "aws_security_group" "lb_security_group" {
     from_port = 80
     to_port   = 80
 
-    cidr_blocks = [element(var.whitelist, count.index)]
+    cidr_blocks = var.whitelist
   }
 
   ingress {
@@ -34,7 +34,7 @@ resource "aws_security_group" "lb_security_group" {
     from_port = 443
     to_port   = 443
 
-    cidr_blocks = [element(var.whitelist, count.index)]
+    cidr_blocks = var.whitelist
   }
 
   egress {
