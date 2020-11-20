@@ -125,8 +125,8 @@ variable "api_service_desired_count" {
   default     = "1"
 }
 
-variable "whitelist" {
-  description = "The whitelisted IPs for accessing the cluster"
+variable "allow_list" {
+  description = "The allowed list of IPs for accessing the cluster"
   default     = ["0.0.0.0/0"]
 }
 
