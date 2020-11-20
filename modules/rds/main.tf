@@ -56,12 +56,17 @@ resource "aws_db_instance" "default" {
   instance_class             = var.instance_class
   username                   = var.username
   password                   = var.password
-  backup_retention_period    = 1
+  backup_retention_period    = var.backup_retention_period
   db_subnet_group_name       = var.subnet_group
-  auto_minor_version_upgrade = true
-  deletion_protection        = false
-  multi_az                   = false
+  auto_minor_version_upgrade = var.auto_minor_version_upgrade
+  deletion_protection        = var.deletion_protection
+  multi_az                   = var.multi_az
+  copy_tags_to_snapshot      = var.copy_tags_to_snapshot
+  option_group_name          = var.option_group_name
   skip_final_snapshot        = true
+
+  performance_insights_enabled    = var.performance_insights
+  enabled_cloudwatch_logs_exports = var.cloudwatch_log_exports
 
   vpc_security_group_ids = [
     aws_security_group.rds_security_group.id,
