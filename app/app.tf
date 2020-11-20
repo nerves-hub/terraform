@@ -204,7 +204,7 @@ module "ca_db" {
   engine_version    = var.db_engine_version
   vpc_id            = module.vpc.vpc_id
   kms_key           = aws_kms_key.db_enc_key.arn
-  security_groups   = module.ca.security_group
+  security_groups   = module.ca.security_group_id
 }
 
 module "ca" {
