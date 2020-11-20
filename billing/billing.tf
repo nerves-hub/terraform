@@ -24,7 +24,7 @@ module "billing" {
   vpc        = module.vpc
   cluster    = module.ecs_cluster
   db         = module.billing_db
-  log_group  = module.ecs_cluster.log_group
+  log_group  = module.ecs_cluster.log_group_name
   app_bucket = aws_s3_bucket.web_application_data.bucket
   ca_bucket  = module.ca.bucket
 

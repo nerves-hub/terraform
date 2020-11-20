@@ -43,3 +43,47 @@ variable "tags" {
     terraform = true
   }
 }
+
+variable "security_groups" {
+  default = [""]
+}
+
+variable "cidr_blocks" {
+  default = [""]
+}
+
+variable "backup_retention_period" {
+  default = 1
+}
+
+variable "performance_insights" {
+  default = false
+}
+
+variable "auto_minor_version_upgrade" {
+  default = true
+}
+
+variable "deletion_protection" {
+  default = false
+}
+
+variable "multi_az" {
+  default = false
+}
+
+variable "copy_tags_to_snapshot" {
+  default = false
+}
+
+variable "option_group_name" {
+  default = ""
+}
+
+variable "parameter_group_name" {
+  default = ""
+}
+
+variable "cloudwatch_log_exports" {
+  default = []
+}

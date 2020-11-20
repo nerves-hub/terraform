@@ -7,6 +7,14 @@ data "aws_caller_identity" "current" {}
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "nerves-hub-${var.environment}"
 
+  dynamic "setting" {
+    for_each = var.settings == "containerInsights" ? [var.settings] : []
+    content {
+      name  = setting.value
+      value = "enabled"
+    }
+  }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -26,7 +34,7 @@ resource "aws_security_group" "lb_security_group" {
     from_port = 80
     to_port   = 80
 
-    cidr_blocks = [element(var.whitelist, count.index)]
+    cidr_blocks = var.allow_list
   }
 
   ingress {
@@ -34,7 +42,7 @@ resource "aws_security_group" "lb_security_group" {
     from_port = 443
     to_port   = 443
 
-    cidr_blocks = [element(var.whitelist, count.index)]
+    cidr_blocks = var.allow_list
   }
 
   egress {

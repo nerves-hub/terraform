@@ -115,24 +115,7 @@ module "web_db" {
   engine_version    = var.db_engine_version
   vpc_id            = module.vpc.vpc_id
   kms_key           = aws_kms_key.db_enc_key.arn
-}
-
-resource "aws_security_group_rule" "db_security_group_web_ingress" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.web_security_group.id
-  security_group_id        = module.web_db.security_group.id
-}
-
-resource "aws_security_group_rule" "db_security_group_web_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = module.web_db.security_group.id
+  security_groups   = aws_security_group.web_security_group.id
 }
 
 # Storage
@@ -221,6 +204,7 @@ module "ca_db" {
   engine_version    = var.db_engine_version
   vpc_id            = module.vpc.vpc_id
   kms_key           = aws_kms_key.db_enc_key.arn
+  security_groups   = module.ca.security_group_id
 }
 
 module "ca" {
@@ -233,7 +217,7 @@ module "ca" {
   vpc       = module.vpc
   cluster   = module.ecs_cluster
   db        = module.ca_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   task_execution_role = aws_iam_role.ecs_tasks_execution_role
   docker_image        = var.ca_image
@@ -262,7 +246,7 @@ module "www" {
   task_security_group_id = aws_security_group.web_security_group.id
 
   db        = module.web_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   erl_cookie             = var.erl_cookie
   live_view_signing_salt = var.www_live_view_signing_salt
@@ -293,7 +277,7 @@ module "api" {
   task_security_group_id = aws_security_group.web_security_group.id
 
   db        = module.web_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   erl_cookie      = var.erl_cookie
   app_bucket      = aws_s3_bucket.web_application_data.bucket
@@ -324,7 +308,7 @@ module "device" {
   task_security_group_id = aws_security_group.web_security_group.id
 
   db        = module.web_db
-  log_group = module.ecs_cluster.log_group
+  log_group = module.ecs_cluster.log_group_name
 
   erl_cookie      = var.erl_cookie
   app_bucket      = aws_s3_bucket.web_application_data.bucket

@@ -31,25 +31,6 @@ resource "aws_security_group_rule" "ca_security_group_web_ingress" {
   security_group_id        = aws_security_group.ca_security_group.id
 }
 
-resource "aws_security_group_rule" "db_security_group_ca_ingress" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.ca_security_group.id
-  security_group_id        = var.db.security_group.id
-}
-
-resource "aws_security_group_rule" "db_security_group_ca_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = var.db.security_group.id
-}
-
-
 # Storage
 resource "aws_s3_bucket" "ca_application_data" {
   bucket = "${var.bucket_prefix}-${terraform.workspace}-ca"
@@ -71,7 +52,7 @@ resource "aws_s3_bucket" "ca_application_data" {
   logging {
     target_bucket = var.s3_access_log_bucket
     target_prefix = var.s3_prefix
-
+  }
   tags = var.tags
 }
 
@@ -113,6 +94,7 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_secret_db_url" {
   type      = "SecureString"
   value     = "postgres://${var.db.username}:${var.db.password}@${var.db.endpoint}/${var.db.name}"
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_secret_erl_cookie" {
@@ -120,6 +102,7 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_secret_erl_cookie" {
   type      = "SecureString"
   value     = var.erl_cookie
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_s3_bucket" {
@@ -127,6 +110,7 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_s3_bucket" {
   type      = "String"
   value     = aws_s3_bucket.ca_application_data.bucket
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_app_name" {
@@ -134,6 +118,7 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_app_name" {
   type      = "String"
   value     = "nerves_hub_ca"
   overwrite = true
+  tags      = var.tags
 }
 
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_host" {
@@ -141,6 +126,7 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_host" {
   type      = "String"
   value     = "ca.${terraform.workspace}.${var.domain}"
   overwrite = true
+  tags      = var.tags
 }
 
 # Roles
@@ -163,7 +149,7 @@ resource "aws_iam_role" "ca_task_role" {
   ]
 }
 EOF
-
+  tags               = var.tags
 }
 
 data "aws_iam_policy_document" "ca_iam_policy" {
@@ -294,6 +280,7 @@ resource "aws_service_discovery_service" "ca_service_discovery" {
   health_check_custom_config {
     failure_threshold = 1
   }
+  tags = var.tags
 }
 
 # ECS
