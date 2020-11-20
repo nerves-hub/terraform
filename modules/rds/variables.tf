@@ -80,6 +80,10 @@ variable "option_group_name" {
   default = ""
 }
 
+variable "parameter_group_name" {
+  default = ""
+}
+
 variable "cloudwatch_log_exports" {
   default = []
 }

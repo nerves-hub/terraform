@@ -63,6 +63,7 @@ resource "aws_db_instance" "default" {
   multi_az                   = var.multi_az
   copy_tags_to_snapshot      = var.copy_tags_to_snapshot
   option_group_name          = var.option_group_name
+  parameter_group_name       = var.parameter_group_name
   skip_final_snapshot        = true
 
   performance_insights_enabled    = var.performance_insights
