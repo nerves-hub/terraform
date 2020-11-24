@@ -179,8 +179,6 @@ resource "aws_s3_bucket_object" "web_application_data_firmware" {
 }
 
 # DNS
-
-
 resource "aws_service_discovery_private_dns_namespace" "local_dns_namespace" {
   name        = "${terraform.workspace}.nerves-hub.local"
   description = terraform.workspace
@@ -327,7 +325,6 @@ module "device" {
 
 module "route53" {
   source                 = "../modules/route53"
-  domain                 = var.domain
   api_lb                 = module.api
   device_lb              = module.device
   www_lb                 = module.www

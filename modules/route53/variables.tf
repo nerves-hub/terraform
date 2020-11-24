@@ -1,4 +1,3 @@
-variable "domain" {}
 variable "api_lb" {}
 variable "device_lb" {}
 variable "www_lb" {}
