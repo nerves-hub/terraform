@@ -48,33 +48,12 @@ resource "aws_lb_listener" "www_lb_listener" {
   }
 }
 
-resource "aws_route53_record" "www_dns_record" {
-  zone_id = var.public_dns_zone.zone_id
-  name    = terraform.workspace == "production" ? "www.${var.domain}." : "www.${terraform.workspace}.${var.domain}."
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.www_lb.dns_name
-    zone_id                = aws_lb.www_lb.zone_id
-    evaluate_target_health = false
-  }
-
-  depends_on = [
-    aws_lb.www_lb
-  ]
-}
-
-data "aws_acm_certificate" "www_certificate" {
-  domain   = "www.${terraform.workspace}.${var.domain}"
-  statuses = ["ISSUED"]
-}
-
 resource "aws_lb_listener" "www_ssl_lb_listener" {
   load_balancer_arn = aws_lb.www_lb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
-  certificate_arn   = data.aws_acm_certificate.www_certificate.arn
+  certificate_arn   = var.certificate_arn
 
   default_action {
     type             = "forward"
@@ -150,7 +129,7 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_port" {
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_host" {
   name      = "/nerves_hub_www/${terraform.workspace}/HOST"
   type      = "String"
-  value     = "www.${terraform.workspace}.${var.domain}"
+  value     = var.host_name
   overwrite = true
   tags      = var.tags
 }

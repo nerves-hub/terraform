@@ -48,22 +48,6 @@ resource "aws_lb_listener" "device_lb_listener" {
   }
 }
 
-resource "aws_route53_record" "device_dns_record" {
-  zone_id = var.public_dns_zone.zone_id
-  name    = terraform.workspace == "production" ? "device.${var.domain}." : "device.${terraform.workspace}.${var.domain}."
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.device_lb.dns_name
-    zone_id                = aws_lb.device_lb.zone_id
-    evaluate_target_health = false
-  }
-
-  depends_on = [
-    aws_lb.device_lb
-  ]
-}
-
 # SSM
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_db_url" {
   name      = "/${local.device_app_name}/${terraform.workspace}/DATABASE_URL"
@@ -132,7 +116,7 @@ resource "aws_ssm_parameter" "nerves_hub_device_ssm_port" {
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_host" {
   name      = "/${local.device_app_name}/${terraform.workspace}/HOST"
   type      = "String"
-  value     = "device.${terraform.workspace}.${var.domain}"
+  value     = var.host_name
   overwrite = true
   tags      = var.tags
 }

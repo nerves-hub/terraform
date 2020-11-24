@@ -3,8 +3,7 @@ variable "region" {}
 variable "kms_key" {}
 variable "vpc" {}
 variable "task_security_group_id" {}
-variable "public_dns_zone" {}
-variable "domain" {}
+variable "host_name" {}
 variable "db" {}
 variable "log_group" {}
 variable "docker_image" {}
