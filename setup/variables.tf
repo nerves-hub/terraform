@@ -6,7 +6,7 @@ variable "region" {
   description = "AWS Region"
 }
 variable "operators" {
-  type = "list"
+  type = list
 }
 
 # Terraform state
