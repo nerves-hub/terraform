@@ -329,7 +329,7 @@ module "route53" {
   device_lb              = module.device
   www_lb                 = module.www
   dns_zone               = terraform.workspace == "production" ? "${var.domain}." : "${terraform.workspace}.${var.domain}."
-  api_dns_record_name    = terraform.workspace == "production" ? "api.${var.domain}." : "api.${terraform.workspace}.${var.domain}."
-  device_dns_record_name = terraform.workspace == "production" ? "device.${var.domain}." : "device.${terraform.workspace}.${var.domain}."
-  www_dns_record_name    = terraform.workspace == "production" ? "www.${var.domain}." : "www.${terraform.workspace}.${var.domain}."
+  api_dns_record_name    = terraform.workspace == "production" ? "api" : "api.${terraform.workspace}"
+  device_dns_record_name = terraform.workspace == "production" ? "device" : "device.${terraform.workspace}"
+  www_dns_record_name    = terraform.workspace == "production" ? "www" : "www.${terraform.workspace}"
 }
