@@ -4,8 +4,7 @@ variable "kms_key" {}
 variable "vpc" {}
 variable "lb_security_group_id" {}
 variable "task_security_group_id" {}
-variable "public_dns_zone" {}
-variable "domain" {}
+variable "host_name" {}
 variable "db" {}
 variable "log_group" {}
 variable "docker_image" {}
@@ -20,6 +19,7 @@ variable "smtp_username" {}
 variable "smtp_password" {}
 variable "service_count" {}
 variable "task_execution_role" {}
+variable "certificate_arn" {}
 
 variable "tags" {
   description = "A mapping of tags to assign to the resources"

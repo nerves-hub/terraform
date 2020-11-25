@@ -179,15 +179,16 @@ resource "aws_s3_bucket_object" "web_application_data_firmware" {
 }
 
 # DNS
-data "aws_route53_zone" "dns_zone" {
-  name         = terraform.workspace == "production" ? "${var.domain}." : "${terraform.workspace}.${var.domain}."
-  private_zone = false
-}
-
 resource "aws_service_discovery_private_dns_namespace" "local_dns_namespace" {
   name        = "${terraform.workspace}.nerves-hub.local"
   description = terraform.workspace
   vpc         = module.vpc.vpc_id
+}
+
+# Certificate
+data "aws_acm_certificate" "www_certificate" {
+  domain   = "www.${terraform.workspace}.${var.domain}"
+  statuses = ["ISSUED"]
 }
 
 # Database
@@ -235,12 +236,11 @@ module "www" {
 
   account_id = data.aws_caller_identity.current.account_id
   region     = var.region
-  domain     = var.domain
+  host_name  = "www.${terraform.workspace}.${var.domain}"
 
   kms_key         = aws_kms_key.app_enc_key
   vpc             = module.vpc
   cluster         = module.ecs_cluster
-  public_dns_zone = data.aws_route53_zone.dns_zone
 
   lb_security_group_id   = module.ecs_cluster.lb_security_group_id
   task_security_group_id = aws_security_group.web_security_group.id
@@ -260,6 +260,7 @@ module "www" {
   task_execution_role = aws_iam_role.ecs_tasks_execution_role
   docker_image        = var.www_image
   service_count       = var.www_service_desired_count
+  certificate_arn     = data.aws_acm_certificate.www_certificate.arn
 }
 
 module "api" {
@@ -267,12 +268,11 @@ module "api" {
 
   account_id = data.aws_caller_identity.current.account_id
   region     = var.region
-  domain     = var.domain
+  host_name  = "api.${terraform.workspace}.${var.domain}"
 
   kms_key         = aws_kms_key.app_enc_key
   vpc             = module.vpc
   cluster         = module.ecs_cluster
-  public_dns_zone = data.aws_route53_zone.dns_zone
 
   task_security_group_id = aws_security_group.web_security_group.id
 
@@ -298,12 +298,11 @@ module "device" {
 
   account_id = data.aws_caller_identity.current.account_id
   region     = var.region
-  domain     = var.domain
+  host_name  = "device.${terraform.workspace}.${var.domain}"
 
   kms_key         = aws_kms_key.app_enc_key
   vpc             = module.vpc
   cluster         = module.ecs_cluster
-  public_dns_zone = data.aws_route53_zone.dns_zone
 
   task_security_group_id = aws_security_group.web_security_group.id
 
@@ -322,4 +321,15 @@ module "device" {
   task_execution_role = aws_iam_role.ecs_tasks_execution_role
   docker_image        = var.device_image
   service_count       = var.device_service_desired_count
+}
+
+module "route53" {
+  source                 = "../modules/route53"
+  api_lb                 = module.api
+  device_lb              = module.device
+  www_lb                 = module.www
+  dns_zone               = terraform.workspace == "production" ? "${var.domain}." : "${terraform.workspace}.${var.domain}."
+  api_dns_record_name    = terraform.workspace == "production" ? "api.${var.domain}." : "api.${terraform.workspace}.${var.domain}."
+  device_dns_record_name = terraform.workspace == "production" ? "device.${var.domain}." : "device.${terraform.workspace}.${var.domain}."
+  www_dns_record_name    = terraform.workspace == "production" ? "www.${var.domain}." : "www.${terraform.workspace}.${var.domain}."
 }
