@@ -55,7 +55,9 @@ resource "aws_security_group" "lb_security_group" {
     ]
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${aws_ecs_cluster.ecs_cluster.name}-load-balancer"
+  })
 
   lifecycle {
     create_before_destroy = true

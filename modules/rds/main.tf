@@ -35,7 +35,9 @@ resource "aws_security_group" "rds_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${var.identifier}-db-sg"
+  })
 
   lifecycle {
     create_before_destroy = true
