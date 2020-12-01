@@ -6,7 +6,9 @@ resource "aws_security_group" "ca_security_group" {
   description = "nerves-hub-${terraform.workspace}-ca-sg"
   vpc_id      = var.vpc.vpc_id
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "nerves-hub-${terraform.workspace}-ca-sg"
+  })
 
   lifecycle {
     create_before_destroy = true
@@ -124,7 +126,7 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_app_name" {
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_host" {
   name      = "/nerves_hub_ca/${terraform.workspace}/HOST"
   type      = "String"
-  value     = "ca.${terraform.workspace}.${var.domain}"
+  value     = var.host_name
   overwrite = true
   tags      = var.tags
 }

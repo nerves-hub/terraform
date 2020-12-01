@@ -1,6 +1,6 @@
 variable "account_id" {}
 variable "region" {}
-variable "domain" {}
+variable "host_name" {}
 variable "vpc" {}
 variable "cluster" {}
 variable "db" {}

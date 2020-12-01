@@ -213,7 +213,7 @@ module "ca" {
 
   account_id = data.aws_caller_identity.current.account_id
   region     = var.region
-  domain     = var.domain
+  host_name  = "ca.${terraform.workspace}.${var.domain}"
 
   vpc       = module.vpc
   cluster   = module.ecs_cluster
@@ -238,9 +238,9 @@ module "www" {
   region     = var.region
   host_name  = "www.${terraform.workspace}.${var.domain}"
 
-  kms_key         = aws_kms_key.app_enc_key
-  vpc             = module.vpc
-  cluster         = module.ecs_cluster
+  kms_key = aws_kms_key.app_enc_key
+  vpc     = module.vpc
+  cluster = module.ecs_cluster
 
   lb_security_group_id   = module.ecs_cluster.lb_security_group_id
   task_security_group_id = aws_security_group.web_security_group.id
@@ -270,9 +270,9 @@ module "api" {
   region     = var.region
   host_name  = "api.${terraform.workspace}.${var.domain}"
 
-  kms_key         = aws_kms_key.app_enc_key
-  vpc             = module.vpc
-  cluster         = module.ecs_cluster
+  kms_key = aws_kms_key.app_enc_key
+  vpc     = module.vpc
+  cluster = module.ecs_cluster
 
   task_security_group_id = aws_security_group.web_security_group.id
 
@@ -300,9 +300,9 @@ module "device" {
   region     = var.region
   host_name  = "device.${terraform.workspace}.${var.domain}"
 
-  kms_key         = aws_kms_key.app_enc_key
-  vpc             = module.vpc
-  cluster         = module.ecs_cluster
+  kms_key = aws_kms_key.app_enc_key
+  vpc     = module.vpc
+  cluster = module.ecs_cluster
 
   task_security_group_id = aws_security_group.web_security_group.id
 
