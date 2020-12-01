@@ -213,7 +213,7 @@ module "ca" {
 
   account_id = data.aws_caller_identity.current.account_id
   region     = var.region
-  domain     = var.domain
+  host_name  = "ca.${terraform.workspace}.${var.domain}"
 
   vpc       = module.vpc
   cluster   = module.ecs_cluster

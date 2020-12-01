@@ -124,7 +124,7 @@ resource "aws_ssm_parameter" "nerves_hub_ca_ssm_app_name" {
 resource "aws_ssm_parameter" "nerves_hub_ca_ssm_host" {
   name      = "/nerves_hub_ca/${terraform.workspace}/HOST"
   type      = "String"
-  value     = "ca.${terraform.workspace}.${var.domain}"
+  value     = var.host_name
   overwrite = true
   tags      = var.tags
 }
