@@ -125,7 +125,7 @@ variable "api_service_desired_count" {
   default     = "1"
 }
 
-variable "allow_list" {
+variable "allow_list_ipv4" {
   description = "The allowed list of IPs for accessing the cluster"
   default     = ["0.0.0.0/0"]
 }
