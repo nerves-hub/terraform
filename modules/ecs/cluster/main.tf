@@ -34,7 +34,8 @@ resource "aws_security_group" "lb_security_group" {
     from_port = 80
     to_port   = 80
 
-    cidr_blocks = var.allow_list
+    cidr_blocks      = var.allow_list_ipv4
+    ipv6_cidr_blocks = var.allow_list_ipv6
   }
 
   ingress {
@@ -42,7 +43,8 @@ resource "aws_security_group" "lb_security_group" {
     from_port = 443
     to_port   = 443
 
-    cidr_blocks = var.allow_list
+    cidr_blocks      = var.allow_list_ipv4
+    ipv6_cidr_blocks = var.allow_list_ipv6
   }
 
   egress {

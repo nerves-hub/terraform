@@ -22,8 +22,13 @@ variable "log_retention" {
   description = "Cloud watch log retention days"
 }
 
-variable "allow_list" {
-  description = "IPs that are allowed to access the cluster from load balancers"
+variable "allow_list_ipv4" {
+  description = "IPv4s that are allowed to access the cluster from load balancers"
+}
+
+variable "allow_list_ipv6" {
+  description = "IPv6s that are allowed to access the cluster from load balancers"
+  default     = []
 }
 
 variable "settings" {
