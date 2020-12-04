@@ -18,6 +18,23 @@ variable "smtp_username" {}
 variable "smtp_password" {}
 variable "service_count" {}
 variable "task_execution_role" {}
+//variable "lb_type" {
+//  description = "The type of load balancer to create such as network or application"
+//  default     = "network"
+//}
+variable "access_logs" {
+  default = false
+}
+variable "access_logs_bucket" {
+  default = ""
+}
+variable "access_logs_prefix" {
+  default = ""
+}
+variable "internal_lb" {
+  description = "Whether or not the load balancer is internal"
+  default     = false
+}
 variable "tags" {
   description = "A mapping of tags to assign to the resources"
   type        = map(string)

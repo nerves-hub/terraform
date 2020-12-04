@@ -34,6 +34,13 @@ resource "aws_lb" "device_lb" {
   internal           = false
   load_balancer_type = "network"
   subnets            = var.vpc.public_subnets
+
+  access_logs {
+    enabled = var.access_logs
+    bucket  = var.access_logs_bucket
+    prefix  = var.access_logs_prefix
+  }
+
   tags               = var.tags
 }
 

@@ -29,9 +29,15 @@ resource "aws_lb_target_group" "api_lb_tg" {
 
 resource "aws_lb" "api_lb" {
   name               = "nerves-hub-${terraform.workspace}-api-lb"
-  internal           = false
+  internal           = var.internal_lb
   load_balancer_type = "network"
   subnets            = var.vpc.public_subnets
+
+  access_logs {
+    enabled = var.access_logs
+    bucket  = var.access_logs_bucket
+    prefix  = var.access_logs_prefix
+  }
 
   tags = var.tags
 }

@@ -30,10 +30,16 @@ resource "aws_lb_target_group" "www_lb_tg" {
 
 resource "aws_lb" "www_lb" {
   name               = "nerves-hub-${terraform.workspace}-www-lb"
-  internal           = false
+  internal           = var.internal_lb
   load_balancer_type = "application"
   security_groups    = [var.lb_security_group_id]
   subnets            = var.vpc.public_subnets
+
+  access_logs {
+    enabled = var.access_logs
+    bucket = var.access_logs_bucket
+    prefix = var.access_logs_prefix
+  }
   tags               = var.tags
 }
 
