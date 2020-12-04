@@ -8,12 +8,13 @@ resource "aws_iam_user" "ses_smtp_user" {
 }
 
 resource "aws_iam_policy_attachment" "ses_sendmail" {
-  name = aws_iam_user.ses_smtp_user.name
+  name       = "ses-sendmail-attachment"
+  users      = [aws_iam_user.ses_smtp_user.name]
   policy_arn = aws_iam_policy.SendRawEmail.arn
 }
 
 resource "aws_iam_policy" "SendRawEmail" {
-  name = var.policy_name
+  name   = var.policy_name
   policy = data.aws_iam_policy_document.ses_sendmail.json
 }
 
@@ -21,8 +22,11 @@ data "aws_iam_policy_document" "ses_sendmail" {
   statement {
     effect = "Allow"
     actions = [
+      "ses:SendEmail",
       "ses:SendRawEmail"
     ]
-    resources = ["*"]
+    resources = [
+      aws_ses_email_identity.nerves_hub_send.arn
+    ]
   }
 }

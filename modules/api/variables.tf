@@ -18,10 +18,9 @@ variable "smtp_username" {}
 variable "smtp_password" {}
 variable "service_count" {}
 variable "task_execution_role" {}
-//variable "lb_type" {
-//  description = "The type of load balancer to create such as network or application"
-//  default     = "network"
-//}
+variable "from_email" {
+  default = "no-reply@nerves-hub.org"
+}
 variable "access_logs" {
   default = false
 }

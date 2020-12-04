@@ -20,6 +20,9 @@ variable "smtp_password" {}
 variable "service_count" {}
 variable "task_execution_role" {}
 variable "certificate_arn" {}
+variable "from_email" {
+  default = "no-reply@nerves-hub.org"
+}
 variable "access_logs" {
   default = false
 }
