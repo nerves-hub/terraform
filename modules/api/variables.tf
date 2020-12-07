@@ -24,8 +24,11 @@ variable "from_email" {
 variable "access_logs" {
   default = false
 }
-variable "log_prefix" {
-  default = "nerves-hub-api-nlb/"
+variable "access_logs_bucket" {
+  default = ""
+}
+variable "access_logs_prefix" {
+  default = "nerves-hub-api-nlb"
 }
 variable "internal_lb" {
   description = "Whether or not the load balancer is internal"

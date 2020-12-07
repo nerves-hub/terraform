@@ -26,7 +26,10 @@ variable "from_email" {
 variable "access_logs" {
   default = false
 }
-variable "log_prefix" {
+variable "access_logs_bucket" {
+  default = ""
+}
+variable "access_logs_prefix" {
   default = "nerves-hub-www-alb"
 }
 variable "internal_lb" {

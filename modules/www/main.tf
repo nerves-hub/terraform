@@ -37,8 +37,8 @@ resource "aws_lb" "www_lb" {
 
   access_logs {
     enabled = var.access_logs
-    bucket  = var.log_bucket
-    prefix  = var.log_prefix
+    bucket  = var.access_logs_bucket
+    prefix  = var.access_logs_prefix
   }
   tags = var.tags
 }
