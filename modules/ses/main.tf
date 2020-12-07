@@ -34,7 +34,12 @@ data "aws_iam_policy_document" "ses_sendmail" {
       "ses:SendRawEmail"
     ]
     resources = [
-      aws_ses_email_identity.nerves_hub_send.arn
+      "*"
     ]
+    condition {
+      test = "StringEquals"
+      variable = "ses:FromAddress"
+      values = [var.email_identity]
+    }
   }
 }
