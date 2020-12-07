@@ -7,9 +7,17 @@ resource "aws_iam_user" "ses_smtp_user" {
   name = var.user
 }
 
-resource "aws_iam_policy_attachment" "ses_sendmail" {
-  name       = "ses-sendmail-attachment"
-  users      = [aws_iam_user.ses_smtp_user.name]
+resource "aws_iam_group" "ses_sendmail" {
+  name = var.group_name
+}
+
+resource "aws_iam_user_group_membership" "ses_sendmail" {
+  groups = [aws_iam_group.ses_sendmail.name]
+  user   = aws_iam_user.ses_smtp_user.name
+}
+
+resource "aws_iam_group_policy_attachment" "ses_sendmail" {
+  group      = aws_iam_group.ses_sendmail.name
   policy_arn = aws_iam_policy.SendRawEmail.arn
 }
 
