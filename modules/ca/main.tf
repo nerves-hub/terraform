@@ -39,7 +39,7 @@ resource "aws_s3_bucket" "ca_application_data" {
   acl    = "private"
 
   versioning {
-    enabled = false
+    enabled = var.s3_versioning
   }
 
   server_side_encryption_configuration {
@@ -56,6 +56,29 @@ resource "aws_s3_bucket" "ca_application_data" {
     target_prefix = var.s3_prefix
   }
   tags = var.tags
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyUnEncryptedTransfers",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::${var.bucket_prefix}-${terraform.workspace}-ca/*",
+        "arn:aws:s3:::${var.bucket_prefix}-${terraform.workspace}-ca"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_s3_bucket_public_access_block" "ca_application_data" {

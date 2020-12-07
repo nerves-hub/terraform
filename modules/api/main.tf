@@ -35,8 +35,8 @@ resource "aws_lb" "api_lb" {
 
   access_logs {
     enabled = var.access_logs
-    bucket  = var.access_logs_bucket
-    prefix  = var.access_logs_prefix
+    bucket  = var.log_bucket
+    prefix  = var.log_prefix
   }
 
   tags = var.tags

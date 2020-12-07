@@ -24,11 +24,8 @@ variable "from_email" {
 variable "access_logs" {
   default = false
 }
-variable "access_logs_bucket" {
-  default = ""
-}
-variable "access_logs_prefix" {
-  default = ""
+variable "log_prefix" {
+  default = "nerves-hub-device-nlb"
 }
 variable "tags" {
   description = "A mapping of tags to assign to the resources"

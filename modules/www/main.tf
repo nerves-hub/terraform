@@ -37,8 +37,8 @@ resource "aws_lb" "www_lb" {
 
   access_logs {
     enabled = var.access_logs
-    bucket  = var.access_logs_bucket
-    prefix  = var.access_logs_prefix
+    bucket  = var.log_bucket
+    prefix  = var.log_prefix
   }
   tags = var.tags
 }
@@ -49,8 +49,13 @@ resource "aws_lb_listener" "www_lb_listener" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.www_lb_tg.arn
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 
