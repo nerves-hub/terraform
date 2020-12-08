@@ -18,6 +18,22 @@ variable "smtp_username" {}
 variable "smtp_password" {}
 variable "service_count" {}
 variable "task_execution_role" {}
+variable "from_email" {
+  default = "no-reply@nerves-hub.org"
+}
+variable "access_logs" {
+  default = false
+}
+variable "access_logs_bucket" {
+  default = ""
+}
+variable "access_logs_prefix" {
+  default = "nerves-hub-api-nlb"
+}
+variable "internal_lb" {
+  description = "Whether or not the load balancer is internal"
+  default     = false
+}
 variable "tags" {
   description = "A mapping of tags to assign to the resources"
   type        = map(string)

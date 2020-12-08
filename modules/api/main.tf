@@ -29,9 +29,15 @@ resource "aws_lb_target_group" "api_lb_tg" {
 
 resource "aws_lb" "api_lb" {
   name               = "nerves-hub-${terraform.workspace}-api-lb"
-  internal           = false
+  internal           = var.internal_lb
   load_balancer_type = "network"
   subnets            = var.vpc.public_subnets
+
+  access_logs {
+    enabled = var.access_logs
+    bucket  = var.access_logs_bucket
+    prefix  = var.access_logs_prefix
+  }
 
   tags = var.tags
 }
@@ -160,12 +166,26 @@ resource "aws_ssm_parameter" "nerves_hub_api_ssm_ses_server" {
   tags      = var.tags
 }
 
+resource "aws_ssm_parameter" "nerves_hub_www_ses_from_email" {
+  name      = "/${local.app_name}/${terraform.workspace}/FROM_EMAIL"
+  type      = "SecureString"
+  value     = var.from_email
+  overwrite = true
+  tags      = var.tags
+}
+
+# Set lifecycle parameter for SMTP creds to avoid sensitive info in tfvars
+# To accommodate for AWS SES Access Keys generated
 resource "aws_ssm_parameter" "nerves_hub_api_ssm_smtp_username" {
   name      = "/${local.app_name}/${terraform.workspace}/SMTP_USERNAME"
   type      = "SecureString"
   value     = var.smtp_password
   overwrite = true
   tags      = var.tags
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "nerves_hub_api_ssm_secret_smtp_password" {
@@ -174,6 +194,10 @@ resource "aws_ssm_parameter" "nerves_hub_api_ssm_secret_smtp_password" {
   value     = var.smtp_username
   overwrite = true
   tags      = var.tags
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 # Roles

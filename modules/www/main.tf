@@ -30,11 +30,17 @@ resource "aws_lb_target_group" "www_lb_tg" {
 
 resource "aws_lb" "www_lb" {
   name               = "nerves-hub-${terraform.workspace}-www-lb"
-  internal           = false
+  internal           = var.internal_lb
   load_balancer_type = "application"
   security_groups    = [var.lb_security_group_id]
   subnets            = var.vpc.public_subnets
-  tags               = var.tags
+
+  access_logs {
+    enabled = var.access_logs
+    bucket  = var.access_logs_bucket
+    prefix  = var.access_logs_prefix
+  }
+  tags = var.tags
 }
 
 resource "aws_lb_listener" "www_lb_listener" {
@@ -43,8 +49,13 @@ resource "aws_lb_listener" "www_lb_listener" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.www_lb_tg.arn
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 
@@ -158,6 +169,14 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_secret_key_base" {
   tags      = var.tags
 }
 
+resource "aws_ssm_parameter" "nerves_hub_www_ses_from_email" {
+  name      = "/nerves_hub_www/${terraform.workspace}/FROM_EMAIL"
+  type      = "SecureString"
+  value     = var.from_email
+  overwrite = true
+  tags      = var.tags
+}
+
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_port" {
   name      = "/nerves_hub_www/${terraform.workspace}/SES_PORT"
   type      = "String"
@@ -174,12 +193,18 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_server" {
   tags      = var.tags
 }
 
+# Set lifecycle parameter for SMTP creds to avoid sensitive info in tfvars
+# To accommodate for AWS SES Access Keys generated
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_smtp_username" {
   name      = "/nerves_hub_www/${terraform.workspace}/SMTP_USERNAME"
   type      = "SecureString"
   value     = var.smtp_password
   overwrite = true
   tags      = var.tags
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_smtp_password" {
@@ -188,6 +213,10 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_smtp_password" {
   value     = var.smtp_username
   overwrite = true
   tags      = var.tags
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 # Roles
