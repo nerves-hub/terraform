@@ -1,3 +1,8 @@
+locals {
+  parameter_group_name = var.create ? var.name : var.parameter_group_name
+  option_group_name    = var.create ? var.name : var.option_group_name
+}
+
 # RDS instance security group
 resource "aws_security_group" "rds_security_group" {
   name        = "${var.identifier}-db-sg"
@@ -64,8 +69,8 @@ resource "aws_db_instance" "default" {
   deletion_protection        = var.deletion_protection
   multi_az                   = var.multi_az
   copy_tags_to_snapshot      = var.copy_tags_to_snapshot
-  option_group_name          = var.option_group_name
-  parameter_group_name       = var.parameter_group_name
+  option_group_name          = local.option_group_name
+  parameter_group_name       = local.parameter_group_name
   skip_final_snapshot        = true
 
   performance_insights_enabled    = var.performance_insights
@@ -82,4 +87,65 @@ resource "aws_db_instance" "default" {
   }
 
   tags = var.tags
+}
+
+resource "aws_db_parameter_group" "this" {
+  count = var.create ? 1 : 0
+
+  name        = var.name
+  description = "Parameter Group for ${var.name}"
+  family      = var.family
+
+  dynamic "parameter" {
+    for_each = var.parameters
+    content {
+      name         = parameter.value.name
+      value        = parameter.value.value
+      apply_method = lookup(parameter.value, "apply_method", null)
+    }
+  }
+
+  tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_db_option_group" "this" {
+  count = var.create ? 1 : 0
+
+  name_prefix              = var.name
+  option_group_description = "Option group for ${var.name}"
+  engine_name              = "postgres"
+  major_engine_version     = var.major_engine_version
+
+  dynamic "option" {
+    for_each = var.options
+    content {
+      option_name                    = option.value.option_name
+      port                           = lookup(option.value, "port", null)
+      version                        = lookup(option.value, "version", null)
+      db_security_group_memberships  = lookup(option.value, "db_security_group_memberships", null)
+      vpc_security_group_memberships = lookup(option.value, "vpc_security_group_memberships", null)
+
+      dynamic "option_settings" {
+        for_each = lookup(option.value, "option_settings", [])
+        content {
+          name  = lookup(option_settings.value, "name", null)
+          value = lookup(option_settings.value, "value", null)
+        }
+      }
+    }
+  }
+
+  tags = var.tags
+
+  timeouts {
+    delete = lookup(var.timeouts, "delete", null)
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

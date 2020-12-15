@@ -87,3 +87,31 @@ variable "parameter_group_name" {
 variable "cloudwatch_log_exports" {
   default = []
 }
+
+variable "create" {
+  default = false
+}
+
+variable "family" {
+  default = ""
+}
+
+variable "parameters" {
+  default = []
+}
+
+variable "options" {
+  default = []
+}
+
+variable "major_engine_version" {
+  default = 11
+}
+
+variable "timeouts" {
+  description = "Define maximum timeout for deletion of `aws_db_option_group` resource"
+  type        = map(string)
+  default = {
+    delete = "15m"
+  }
+}
