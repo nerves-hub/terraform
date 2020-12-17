@@ -333,8 +333,6 @@ data "aws_iam_policy_document" "www_iam_policy" {
   statement {
     actions = [
       "ecs:DeregisterContainerInstance",
-      "ecs:DescribeServices",
-      "ecs:DescribeTasks",
       "ecs:RegisterContainerInstance",
       "ecs:StartTask",
       "ecs:Submit*",
@@ -350,6 +348,8 @@ data "aws_iam_policy_document" "www_iam_policy" {
 
   statement {
     actions = [
+      "ecs:DescribeServices",
+      "ecs:DescribeTasks",
       "ecs:DiscoverPollEndpoint",
       "ecs:ListServices",
       "ecs:ListTasks",

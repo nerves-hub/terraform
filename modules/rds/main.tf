@@ -85,8 +85,8 @@ resource "aws_db_instance" "default" {
 }
 
 resource "aws_db_parameter_group" "this" {
-  name        = var.name
-  description = "Parameter Group for ${var.name}"
+  name        = var.identifier
+  description = "Database Parameter Group for ${var.identifier}"
   family      = var.family
 
   dynamic "parameter" {
@@ -106,8 +106,8 @@ resource "aws_db_parameter_group" "this" {
 }
 
 resource "aws_db_option_group" "this" {
-  name_prefix              = "${var.name}-"
-  option_group_description = "Option group for ${var.name}"
+  name_prefix              = "${var.identifier}-"
+  option_group_description = "Database Option group for ${var.identifier}"
   engine_name              = "postgres"
   major_engine_version     = var.major_engine_version
 
