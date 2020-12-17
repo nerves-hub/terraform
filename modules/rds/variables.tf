@@ -88,12 +88,8 @@ variable "cloudwatch_log_exports" {
   default = []
 }
 
-variable "create" {
-  default = false
-}
-
 variable "family" {
-  default = ""
+  default = "postgres11"
 }
 
 variable "parameters" {
