@@ -313,12 +313,12 @@ data "aws_iam_policy_document" "api_iam_policy" {
 
   statement {
     actions = [
-      "ecs:StartTask",
-      "ecs:Submit*",
-      "ecs:RegisterContainerInstance",
       "ecs:DeregisterContainerInstance",
       "ecs:DescribeServices",
       "ecs:DescribeTasks",
+      "ecs:RegisterContainerInstance",
+      "ecs:StartTask",
+      "ecs:Submit*",
     ]
 
     resources = [
@@ -331,15 +331,14 @@ data "aws_iam_policy_document" "api_iam_policy" {
 
   statement {
     actions = [
-      "logs:CreateLogGroup",
-      "logs:DescribeLogStreams",
       "ecs:DiscoverPollEndpoint",
+      "ecs:ListServices",
+      "ecs:ListTasks",
       "ecs:Poll",
       "ecs:StartTelemetrySession",
       "ecs:UpdateContainerInstancesState",
-      "ecs:DiscoverPollEndpoint",
-      "ecs:ListTasks",
-      "ecs:ListServices",
+      "logs:CreateLogGroup",
+      "logs:DescribeLogStreams",
     ]
 
     resources = [

@@ -249,10 +249,10 @@ data "aws_iam_policy_document" "ca_iam_policy" {
 
   statement {
     actions = [
-      "ecs:Submit*",
-      "ecs:RegisterContainerInstance",
       "ecs:DeregisterContainerInstance",
+      "ecs:RegisterContainerInstance",
       "ecs:StartTask",
+      "ecs:Submit*",
     ]
 
     resources = [
@@ -265,13 +265,12 @@ data "aws_iam_policy_document" "ca_iam_policy" {
 
   statement {
     actions = [
-      "logs:CreateLogGroup",
-      "logs:DescribeLogStreams",
-      "ecs:DiscoverPollEndpoint",
-      "ecs:StartTelemetrySession",
-      "ecs:UpdateContainerInstancesState",
       "ecs:DiscoverPollEndpoint",
       "ecs:Poll",
+      "ecs:StartTelemetrySession",
+      "ecs:UpdateContainerInstancesState",
+      "logs:CreateLogGroup",
+      "logs:DescribeLogStreams",
     ]
 
     resources = [

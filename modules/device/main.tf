@@ -306,11 +306,11 @@ data "aws_iam_policy_document" "device_iam_policy" {
 
   statement {
     actions = [
-      "ecs:RegisterContainerInstance",
       "ecs:DeregisterContainerInstance",
-      "ecs:StartTask",
       "ecs:DescribeServices",
       "ecs:DescribeTasks",
+      "ecs:RegisterContainerInstance",
+      "ecs:StartTask",
       "ecs:Submit*",
     ]
 
@@ -324,15 +324,14 @@ data "aws_iam_policy_document" "device_iam_policy" {
 
   statement {
     actions = [
-      "logs:CreateLogGroup",
-      "logs:DescribeLogStreams",
       "ecs:DiscoverPollEndpoint",
+      "ecs:ListServices",
+      "ecs:ListTasks",
       "ecs:Poll",
       "ecs:StartTelemetrySession",
       "ecs:UpdateContainerInstancesState",
-      "ecs:ListTasks",
-      "ecs:ListServices",
-      "ecs:DiscoverPollEndpoint",
+      "logs:CreateLogGroup",
+      "logs:DescribeLogStreams",
     ]
 
     resources = [
