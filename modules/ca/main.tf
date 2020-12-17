@@ -257,9 +257,7 @@ data "aws_iam_policy_document" "ca_iam_policy" {
 
     resources = [
       aws_ecs_service.ca_ecs_service.cluster,
-      aws_ecs_service.ca_ecs_service.id,
       "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-ca:*",
-      "arn:aws:ecs:${var.region}:${var.account_id}:task/nerves-hub-${terraform.workspace}/*"
     ]
   }
 

@@ -314,9 +314,7 @@ data "aws_iam_policy_document" "device_iam_policy" {
 
     resources = [
       aws_ecs_service.device_ecs_service.cluster,
-      aws_ecs_service.device_ecs_service.id,
       "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-device:*",
-      "arn:aws:ecs:${var.region}:${var.account_id}:task/nerves-hub-${terraform.workspace}/*"
     ]
   }
 
