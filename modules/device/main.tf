@@ -306,37 +306,44 @@ data "aws_iam_policy_document" "device_iam_policy" {
 
   statement {
     actions = [
-      "ecs:DeregisterContainerInstance",
-      "ecs:DiscoverPollEndpoint",
-      "ecs:Poll",
-      "ecs:RegisterContainerInstance",
-      "ecs:StartTelemetrySession",
-      "ecs:UpdateContainerInstancesState",
-      "ecs:Submit*",
-      "ecr:GetAuthorizationToken",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
       "ecs:RegisterContainerInstance",
       "ecs:DeregisterContainerInstance",
-      "ecs:DiscoverPollEndpoint",
       "ecs:StartTask",
-      "ecs:ListTasks",
-      "ecs:ListServices",
       "ecs:DescribeServices",
       "ecs:DescribeTasks",
+      "ecs:Submit*",
+    ]
+
+    resources = [
+      aws_ecs_service.device_ecs_service.cluster,
+      aws_ecs_service.device_ecs_service.id,
+      "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-device:*",
+      "arn:aws:ecs:${var.region}:${var.account_id}:task/nerves-hub-${terraform.workspace}/*"
+    ]
+  }
+
+  statement {
+    actions = [
       "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
       "logs:DescribeLogStreams",
+      "ecs:DiscoverPollEndpoint",
+      "ecs:Poll",
+      "ecs:StartTelemetrySession",
+      "ecs:UpdateContainerInstancesState",
+      "ecs:ListTasks",
+      "ecs:ListServices",
+      "ecs:DiscoverPollEndpoint",
     ]
 
     resources = [
       "*",
     ]
   }
+}
+
+resource "aws_iam_role_policy_attachment" "aws_managed_task_execution_role_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  role = aws_iam_role.device_task_role.name
 }
 
 resource "aws_iam_policy" "device_task_policy" {
