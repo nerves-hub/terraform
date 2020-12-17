@@ -364,11 +364,6 @@ data "aws_iam_policy_document" "www_iam_policy" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "aws_managed_task_execution_role_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-  role = aws_iam_role.www_task_role.name
-}
-
 resource "aws_iam_policy" "www_task_policy" {
   name   = "nerves-hub-${terraform.workspace}-www-task-policy"
   policy = data.aws_iam_policy_document.www_iam_policy.json
