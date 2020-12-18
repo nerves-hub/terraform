@@ -85,7 +85,7 @@ resource "aws_db_instance" "default" {
 }
 
 resource "aws_db_parameter_group" "this" {
-  name_prefix = var.identifier
+  name_prefix = "${var.identifier}-"
   description = "Database Parameter Group for ${var.identifier}"
   family      = var.family
 
