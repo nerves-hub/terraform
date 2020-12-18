@@ -314,29 +314,28 @@ data "aws_iam_policy_document" "api_iam_policy" {
   statement {
     actions = [
       "ecs:DeregisterContainerInstance",
-      "ecs:DiscoverPollEndpoint",
-      "ecs:Poll",
       "ecs:RegisterContainerInstance",
-      "ecs:StartTelemetrySession",
-      "ecs:UpdateContainerInstancesState",
-      "ecs:Submit*",
-      "ecr:GetAuthorizationToken",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "ecs:RegisterContainerInstance",
-      "ecs:DeregisterContainerInstance",
-      "ecs:DiscoverPollEndpoint",
       "ecs:StartTask",
-      "ecs:ListTasks",
-      "ecs:ListServices",
+      "ecs:Submit*",
+    ]
+
+    resources = [
+      aws_ecs_service.api_ecs_service.cluster,
+      "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-api:*",
+    ]
+  }
+
+  statement {
+    actions = [
       "ecs:DescribeServices",
       "ecs:DescribeTasks",
+      "ecs:DiscoverPollEndpoint",
+      "ecs:ListServices",
+      "ecs:ListTasks",
+      "ecs:Poll",
+      "ecs:StartTelemetrySession",
+      "ecs:UpdateContainerInstancesState",
       "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
       "logs:DescribeLogStreams",
     ]
 

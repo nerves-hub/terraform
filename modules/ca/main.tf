@@ -250,25 +250,24 @@ data "aws_iam_policy_document" "ca_iam_policy" {
   statement {
     actions = [
       "ecs:DeregisterContainerInstance",
+      "ecs:RegisterContainerInstance",
+      "ecs:StartTask",
+      "ecs:Submit*",
+    ]
+
+    resources = [
+      aws_ecs_service.ca_ecs_service.cluster,
+      "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-ca:*",
+    ]
+  }
+
+  statement {
+    actions = [
       "ecs:DiscoverPollEndpoint",
       "ecs:Poll",
-      "ecs:RegisterContainerInstance",
       "ecs:StartTelemetrySession",
       "ecs:UpdateContainerInstancesState",
-      "ecs:Submit*",
-      "ecr:GetAuthorizationToken",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "ecs:RegisterContainerInstance",
-      "ecs:DeregisterContainerInstance",
-      "ecs:DiscoverPollEndpoint",
-      "ecs:StartTask",
       "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
       "logs:DescribeLogStreams",
     ]
 
@@ -277,7 +276,6 @@ data "aws_iam_policy_document" "ca_iam_policy" {
     ]
   }
 }
-
 
 resource "aws_iam_policy" "ca_task_policy" {
   name   = "nerves-hub-${terraform.workspace}-ca-task-policy"
