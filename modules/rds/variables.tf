@@ -111,3 +111,13 @@ variable "timeouts" {
     delete = "15m"
   }
 }
+
+variable "enhanced_monitoring" {
+  type    = bool
+  default = false
+}
+
+variable "monitoring_interval" {
+  type    = number
+  default = 0
+}
