@@ -145,10 +145,10 @@ resource "aws_db_option_group" "this" {
 }
 
 resource "aws_iam_role" "enhanced_monitoring" {
-  count = var.enhanced_monitoring ? 1 : 0
+  count              = var.enhanced_monitoring ? 1 : 0
   name               = "nerves-hub-rds-enhanced-monitoring-${terraform.workspace}"
   assume_role_policy = data.aws_iam_policy_document.enhanced_monitoring_assume_role_policy[count.index].json
-  tags = var.tags
+  tags               = var.tags
 }
 
 data "aws_iam_policy_document" "enhanced_monitoring_assume_role_policy" {
@@ -166,7 +166,7 @@ data "aws_iam_policy_document" "enhanced_monitoring_assume_role_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "enhanced_monitoring" {
-  count = var.enhanced_monitoring ? 1 : 0
+  count      = var.enhanced_monitoring ? 1 : 0
   role       = aws_iam_role.enhanced_monitoring[count.index].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }

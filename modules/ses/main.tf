@@ -37,9 +37,9 @@ data "aws_iam_policy_document" "ses_sendmail" {
       "*"
     ]
     condition {
-      test = "StringEquals"
+      test     = "StringEquals"
       variable = "ses:FromAddress"
-      values = [var.email_identity]
+      values   = [var.email_identity]
     }
   }
 }
