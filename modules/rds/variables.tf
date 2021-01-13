@@ -111,3 +111,13 @@ variable "timeouts" {
     delete = "15m"
   }
 }
+
+variable "monitoring_role_arn" {
+  type    = string
+  default = null
+}
+
+variable "monitoring_interval" {
+  type    = number
+  default = 0
+}

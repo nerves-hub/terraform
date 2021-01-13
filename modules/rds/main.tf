@@ -71,6 +71,9 @@ resource "aws_db_instance" "default" {
   performance_insights_enabled    = var.performance_insights
   enabled_cloudwatch_logs_exports = var.cloudwatch_log_exports
 
+  monitoring_interval = var.monitoring_interval
+  monitoring_role_arn = var.monitoring_interval > 0 ? var.monitoring_role_arn : null
+
   vpc_security_group_ids = [
     aws_security_group.rds_security_group.id,
   ]
