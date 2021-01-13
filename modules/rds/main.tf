@@ -72,7 +72,7 @@ resource "aws_db_instance" "default" {
   enabled_cloudwatch_logs_exports = var.cloudwatch_log_exports
 
   monitoring_interval = var.monitoring_interval
-  monitoring_role_arn = var.enhanced_monitoring ? join(", ", aws_iam_role.enhanced_monitoring.*.arn) : null
+  monitoring_role_arn = var.monitoring_interval > 0 ? var.monitoring_role_arn : null
 
   vpc_security_group_ids = [
     aws_security_group.rds_security_group.id,
@@ -142,31 +142,4 @@ resource "aws_db_option_group" "this" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-resource "aws_iam_role" "enhanced_monitoring" {
-  count              = var.enhanced_monitoring ? 1 : 0
-  name               = "nerves-hub-rds-enhanced-monitoring-${terraform.workspace}"
-  assume_role_policy = data.aws_iam_policy_document.enhanced_monitoring_assume_role_policy[count.index].json
-  tags               = var.tags
-}
-
-data "aws_iam_policy_document" "enhanced_monitoring_assume_role_policy" {
-  count = var.enhanced_monitoring ? 1 : 0
-  statement {
-    actions = [
-      "sts:AssumeRole",
-    ]
-
-    principals {
-      type        = "Service"
-      identifiers = ["monitoring.rds.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "enhanced_monitoring" {
-  count      = var.enhanced_monitoring ? 1 : 0
-  role       = aws_iam_role.enhanced_monitoring[count.index].name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }

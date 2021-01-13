@@ -112,9 +112,9 @@ variable "timeouts" {
   }
 }
 
-variable "enhanced_monitoring" {
-  type    = bool
-  default = false
+variable "monitoring_role_arn" {
+  type    = string
+  default = null
 }
 
 variable "monitoring_interval" {
