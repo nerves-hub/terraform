@@ -2,8 +2,8 @@
 ## AWS
 ##
 
-aws_region = "us-east-1"
-aws_profile = "nerves-hub"
+region = "us-east-1"
+profile = "nerves-hub"
 
 ##
 ## Terraform
