@@ -272,6 +272,7 @@ module "www" {
   secret_key_base        = var.web_secret_key_base
   smtp_username          = var.web_smtp_username
   smtp_password          = var.web_smtp_password
+  from_email             = var.web_from_email
 
   task_execution_role = aws_iam_role.ecs_tasks_execution_role
   docker_image        = var.www_image
@@ -303,6 +304,7 @@ module "api" {
   secret_key_base = var.web_secret_key_base
   smtp_username   = var.web_smtp_username
   smtp_password   = var.web_smtp_password
+  from_email      = var.web_from_email
 
   task_execution_role = aws_iam_role.ecs_tasks_execution_role
   docker_image        = var.api_image
@@ -334,6 +336,7 @@ module "device" {
   secret_key_base = var.web_secret_key_base
   smtp_username   = var.web_smtp_username
   smtp_password   = var.web_smtp_password
+  from_email      = var.web_from_email
 
   task_execution_role = aws_iam_role.ecs_tasks_execution_role
   docker_image        = var.device_image

@@ -176,6 +176,13 @@ resource "aws_ssm_parameter" "nerves_hub_api_ssm_secret_smtp_password" {
   overwrite = true
 }
 
+resource "aws_ssm_parameter" "nerves_hub_api_ssm_from_email" {
+  name      = "/${local.app_name}/${terraform.workspace}/FROM_EMAIL"
+  type      = "String"
+  value     = var.from_email
+  overwrite = true
+}
+
 # Roles
 ## Task role
 resource "aws_iam_role" "api_task_role" {
