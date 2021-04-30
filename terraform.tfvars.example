@@ -54,6 +54,7 @@ web_secret_key_base = "123456"
 # Email (SES)
 web_smtp_username = "nerveshub"
 web_smtp_password = "12345"
+#web_from_email = "no-reply@nerves-hub.org"
 
 #whitelist = ["0.0.0.0/0"]
 

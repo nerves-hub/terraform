@@ -18,5 +18,6 @@ variable "cluster" {}
 variable "secret_key_base" {}
 variable "smtp_username" {}
 variable "smtp_password" {}
+variable "from_email" {}
 variable "service_count" {}
 variable "task_execution_role" {}

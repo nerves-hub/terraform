@@ -91,6 +91,10 @@ variable "web_smtp_password" {
   description = "The SES SMTP password"
 }
 
+variable "web_from_email" {
+  description = "The SES sender email"
+}
+
 variable "www_image" {
   description = "The docker image of the nerves_hub_www app"
   default     = "nerveshub/nerves_hub_www:latest"
