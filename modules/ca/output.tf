@@ -13,3 +13,7 @@ output "host" {
 output "security_group_id" {
   value = aws_security_group.ca_security_group.id
 }
+
+output "service_discovery_arn" {
+  value = aws_service_discovery_service.ca_service_discovery.arn
+}
