@@ -8,7 +8,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   name = "nerves-hub-${var.environment}"
 
   setting {
-    name = "containerInsights"
+    name  = "containerInsights"
     value = var.container_insights ? "enabled" : "disabled"
   }
 
