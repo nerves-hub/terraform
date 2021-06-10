@@ -31,9 +31,9 @@ variable "allow_list_ipv6" {
   default     = []
 }
 
-variable "settings" {
-  description = "ECS cluster settings"
-  default     = ""
+variable "container_insights" {
+  description = "ECS cluster container insights enabled or disabled"
+  default     = true
 }
 
 variable "tags" {
