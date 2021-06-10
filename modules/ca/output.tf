@@ -17,3 +17,7 @@ output "security_group_id" {
 output "service_discovery_arn" {
   value = aws_service_discovery_service.ca_service_discovery.arn
 }
+
+output "object_key" {
+  value = aws_s3_bucket_object.ca_application_data_ssl.key
+}
