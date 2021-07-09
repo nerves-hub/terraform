@@ -121,3 +121,8 @@ variable "monitoring_interval" {
   type    = number
   default = 0
 }
+
+variable "maintenance_window" {
+  type    = string
+  default = null
+}
