@@ -61,6 +61,7 @@ resource "aws_db_instance" "default" {
   backup_retention_period    = var.backup_retention_period
   db_subnet_group_name       = var.subnet_group
   auto_minor_version_upgrade = var.auto_minor_version_upgrade
+  maintenance_window         = var.maintenance_window
   deletion_protection        = var.deletion_protection
   multi_az                   = var.multi_az
   copy_tags_to_snapshot      = var.copy_tags_to_snapshot
