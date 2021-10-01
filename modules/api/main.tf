@@ -376,6 +376,11 @@ resource "aws_ecs_task_definition" "api_task_definition" {
            "hostPort": 443,
            "protocol": "tcp",
            "containerPort": 443
+         },
+         {
+           "hostPort": 4369,
+           "protocol": "tcp",
+           "containerPort": 4369
          }
        ],
        "networkMode": "awsvpc",

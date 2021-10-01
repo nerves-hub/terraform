@@ -290,6 +290,11 @@ resource "aws_ecs_task_definition" "billing_task_definition" {
            "hostPort": 8443,
            "protocol": "tcp",
            "containerPort": 8443
+         },
+         {
+           "hostPort": 4369,
+           "protocol": "tcp",
+           "containerPort": 4369
          }
        ],
        "networkMode": "awsvpc",
