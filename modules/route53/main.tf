@@ -1,7 +1,6 @@
 data "aws_route53_zone" "dns_zone" {
   name         = var.dns_zone
   private_zone = false
-  tags         = var.tags
 }
 
 resource "aws_route53_record" "device_dns_record" {
