@@ -215,6 +215,7 @@ resource "aws_iam_role" "device_task_role" {
 }
 EOF
 
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "device_iam_policy" {
@@ -402,6 +403,7 @@ resource "aws_ecs_task_definition" "device_task_definition" {
 
 DEFINITION
 
+  tags = var.tags
 }
 
 resource "aws_ecs_service" "device_ecs_service" {

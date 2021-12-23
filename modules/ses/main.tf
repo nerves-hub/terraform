@@ -5,6 +5,7 @@ resource "aws_ses_email_identity" "nerves_hub_send" {
 
 resource "aws_iam_user" "ses_smtp_user" {
   name = var.user
+  tags = var.tags
 }
 
 resource "aws_iam_group" "ses_sendmail" {

@@ -46,6 +46,7 @@ backend.tfvars
 # Ignore ssl certificates placed in the ssl_certificates folder
 ssl/staging/*
 ssl/production/*
+ssl/
 !ssl/staging/.empty
 !ssl/production/.empty
 
