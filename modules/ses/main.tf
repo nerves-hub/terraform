@@ -10,7 +10,6 @@ resource "aws_iam_user" "ses_smtp_user" {
 
 resource "aws_iam_group" "ses_sendmail" {
   name = var.group_name
-  tags = var.tags
 }
 
 resource "aws_iam_user_group_membership" "ses_sendmail" {
