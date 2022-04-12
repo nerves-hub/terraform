@@ -1,5 +1,12 @@
 locals {
   app_name = "nerves_hub_api"
+  ecs_resources = var.alb ? [
+    aws_ecs_service.api_public_ecs_service[0].cluster,
+    "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-api:*",
+    ] : [
+    aws_ecs_service.api_ecs_service[0].cluster,
+    "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-api:*",
+  ]
 }
 
 resource "random_integer" "target_group_id" {
@@ -9,6 +16,7 @@ resource "random_integer" "target_group_id" {
 
 # Load Balancer
 resource "aws_lb_target_group" "api_lb_tg" {
+  count                = var.nlb ? 1 : 0
   name                 = "nerves-hub-${terraform.workspace}-api-tg-${random_integer.target_group_id.result}"
   port                 = 443
   protocol             = "TCP"
@@ -28,6 +36,7 @@ resource "aws_lb_target_group" "api_lb_tg" {
 }
 
 resource "aws_lb" "api_lb" {
+  count              = var.nlb ? 1 : 0
   name               = "nerves-hub-${terraform.workspace}-api-lb"
   internal           = var.internal_lb
   load_balancer_type = "network"
@@ -43,13 +52,14 @@ resource "aws_lb" "api_lb" {
 }
 
 resource "aws_lb_listener" "api_lb_listener" {
-  load_balancer_arn = aws_lb.api_lb.arn
+  count             = var.nlb ? 1 : 0
+  load_balancer_arn = aws_lb.api_lb[count.index].arn
   port              = "443"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.api_lb_tg.arn
+    target_group_arn = aws_lb_target_group.api_lb_tg[count.index].arn
   }
 }
 
@@ -319,10 +329,7 @@ data "aws_iam_policy_document" "api_iam_policy" {
       "ecs:Submit*",
     ]
 
-    resources = [
-      aws_ecs_service.api_ecs_service.cluster,
-      "arn:aws:ecs:${var.region}:${var.account_id}:task-definition/nerves-hub-${terraform.workspace}-api:*",
-    ]
+    resources = local.ecs_resources
   }
 
   statement {
@@ -414,6 +421,7 @@ DEFINITION
 }
 
 resource "aws_ecs_service" "api_ecs_service" {
+  count   = var.nlb ? 1 : 0
   name    = "nerves-hub-api"
   cluster = var.cluster.arn
 
@@ -432,7 +440,7 @@ resource "aws_ecs_service" "api_ecs_service" {
   health_check_grace_period_seconds = 300
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.api_lb_tg.arn
+    target_group_arn = aws_lb_target_group.api_lb_tg[count.index].arn
     container_name   = local.app_name
     container_port   = 443
   }

@@ -18,6 +18,21 @@ variable "smtp_username" {}
 variable "smtp_password" {}
 variable "service_count" {}
 variable "task_execution_role" {}
+variable "allow_list_ipv4" {
+  default = []
+}
+variable "allow_list_ipv6" {
+  default = []
+}
+variable "alb" {
+  default = false
+}
+variable "nlb" {
+  default = true
+}
+variable "certificate_arn" {
+  default = ""
+}
 variable "from_email" {
   default = "no-reply@nerves-hub.org"
 }
@@ -32,6 +47,10 @@ variable "access_logs_prefix" {
 }
 variable "internal_lb" {
   description = "Whether or not the load balancer is internal"
+  default     = false
+}
+variable "internal_alb" {
+  description = "Whether or not the application load balancer is internal"
   default     = false
 }
 variable "tags" {
