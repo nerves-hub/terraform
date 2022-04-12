@@ -151,7 +151,7 @@ resource "aws_ecs_service" "api_public_ecs_service" {
   # task_definition = "${aws_ecs_task_definition.api_task_definition.family}:${aws_ecs_task_definition.api_task_definition.revision}"
 
   task_definition = aws_ecs_task_definition.api_task_definition.arn
-  desired_count   = var.service_count
+  desired_count   = var.api_public_service_count
   propagate_tags  = "TASK_DEFINITION"
 
   deployment_minimum_healthy_percent = "100"

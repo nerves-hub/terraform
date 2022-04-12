@@ -17,6 +17,9 @@ variable "secret_key_base" {}
 variable "smtp_username" {}
 variable "smtp_password" {}
 variable "service_count" {}
+variable "api_public_service_count" {
+  default = 0
+}
 variable "task_execution_role" {}
 variable "allow_list_ipv4" {
   default = []
