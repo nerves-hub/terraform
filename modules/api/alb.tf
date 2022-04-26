@@ -15,6 +15,7 @@ resource "aws_lb_target_group" "api_alb_tg" {
     unhealthy_threshold = 3
     matcher             = "200-399"
     protocol            = "HTTPS"
+    path                = "/health"
   }
 
   lifecycle {
