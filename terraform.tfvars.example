@@ -65,7 +65,7 @@ www_live_view_signing_salt = "123456"
 #api_image = "nerveshub/nerves_hub_api:latest"
 
 #device_service_desired_count = 1
-#device_image = "nerveshub/nerves_hub_www:latest"
+#device_image = "nerveshub/nerves_hub_device:latest"
 
 #billing_service_desired_count = 1
 #billing_image = "nerveshub/nerves_hub_billing:latest"
