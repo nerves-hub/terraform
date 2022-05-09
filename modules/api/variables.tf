@@ -16,7 +16,9 @@ variable "cluster" {}
 variable "secret_key_base" {}
 variable "smtp_username" {}
 variable "smtp_password" {}
-variable "service_count" {}
+variable "service_count" {
+  default = 0
+}
 variable "api_public_service_count" {
   default = 0
 }

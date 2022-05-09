@@ -85,7 +85,7 @@ No modules.
 | <a name="input_nlb"></a> [nlb](#input\_nlb) | n/a | `bool` | `true` | no |
 | <a name="input_region"></a> [region](#input\_region) | n/a | `any` | n/a | yes |
 | <a name="input_secret_key_base"></a> [secret\_key\_base](#input\_secret\_key\_base) | n/a | `any` | n/a | yes |
-| <a name="input_service_count"></a> [service\_count](#input\_service\_count) | n/a | `any` | n/a | yes |
+| <a name="input_service_count"></a> [service\_count](#input\_service\_count) | n/a | `number` | `0` | no |
 | <a name="input_smtp_password"></a> [smtp\_password](#input\_smtp\_password) | n/a | `any` | n/a | yes |
 | <a name="input_smtp_username"></a> [smtp\_username](#input\_smtp\_username) | n/a | `any` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resources | `map(string)` | <pre>{<br>  "terraform": true<br>}</pre> | no |
