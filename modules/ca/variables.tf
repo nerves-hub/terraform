@@ -36,3 +36,18 @@ variable "s3_prefix" {
   description = "S3 bucket name prefix"
   default     = ""
 }
+
+variable "datadog_image" {
+  description = "Datadog container image"
+  type        = string
+}
+
+variable "docker_image_tag" {
+  description = "Docker Image tag for CA Application"
+  type        = string
+}
+
+variable "datadog_key_arn" {
+  description = "Datadog Key"
+  type        = string
+}

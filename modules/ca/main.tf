@@ -1,5 +1,15 @@
 # nerves_hub_ca
 
+locals {
+  app_name = "nerves_hub_ca"
+
+  ecs_shared_env_vars = <<EOF
+    { "name" : "ENVIRONMENT", "value" : "${terraform.workspace}" },
+    { "name" : "APP_NAME", "value" : "${local.app_name}" }
+EOF
+
+}
+
 # Security Groups
 resource "aws_security_group" "ca_security_group" {
   name        = "nerves-hub-${terraform.workspace}-ca-sg"
@@ -323,6 +333,8 @@ resource "aws_ecs_task_definition" "ca_task_definition" {
 
   container_definitions = <<DEFINITION
    [
+     ${module.logging_configs.fire_lens_container},
+     ${module.logging_configs.datadog_container},
      {
        "portMappings": [
          {
@@ -342,24 +354,30 @@ resource "aws_ecs_task_definition" "ca_task_definition" {
        "privileged": false,
        "name": "nerves_hub_ca",
        "environment": [
-         {
-           "name": "ENVIRONMENT",
-           "value": "${terraform.workspace}"
-         }
+         ${local.ecs_shared_env_vars}
        ],
-       "logConfiguration": {
-         "logDriver": "awslogs",
-         "options": {
-           "awslogs-region": "${var.region}",
-           "awslogs-group": "${var.log_group}",
-           "awslogs-stream-prefix": "nerves_hub_ca"
-         }
-       }
+     ${module.logging_configs.log_configuration}
      }
    ]
-
 DEFINITION
 
+  depends_on = [
+    module.logging_configs
+  ]
+
+}
+
+module "logging_configs" {
+  source           = "../logging_configs"
+  app_name         = local.app_name
+  environment_name = terraform.workspace
+  task_name        = local.app_name
+  datadog_image    = var.datadog_image
+  docker_image_tag = var.docker_image_tag
+  datadog_key_arn  = var.datadog_key_arn
+  region           = var.region
+
+  tags = var.tags
 }
 
 resource "aws_ecs_service" "ca_ecs_service" {
