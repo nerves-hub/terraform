@@ -69,7 +69,6 @@ No requirements.
 | <a name="input_db"></a> [db](#input\_db) | n/a | `any` | n/a | yes |
 | <a name="input_docker_image"></a> [docker\_image](#input\_docker\_image) | n/a | `any` | n/a | yes |
 | <a name="input_docker_image_tag"></a> [docker\_image\_tag](#input\_docker\_image\_tag) | Docker Image Tag of WWW Application | `string` | n/a | yes |
-| <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | n/a | `string` | n/a | yes |
 | <a name="input_erl_cookie"></a> [erl\_cookie](#input\_erl\_cookie) | n/a | `any` | n/a | yes |
 | <a name="input_from_email"></a> [from\_email](#input\_from\_email) | n/a | `string` | `"no-reply@nerves-hub.org"` | no |
 | <a name="input_host_name"></a> [host\_name](#input\_host\_name) | n/a | `any` | n/a | yes |

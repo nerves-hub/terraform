@@ -420,7 +420,6 @@ DEFINITION
 module "logging_configs" {
   source           = "../logging_configs"
   app_name         = local.app_name
-  environment_name = terraform.workspace
   task_name        = local.app_name
   datadog_image    = var.datadog_image
   docker_image_tag = var.docker_image_tag
