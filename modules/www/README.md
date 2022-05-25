@@ -14,7 +14,9 @@ No requirements.
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_logging_configs"></a> [logging\_configs](#module\_logging\_configs) | ../logging_configs | n/a |
 
 ## Resources
 
@@ -58,11 +60,16 @@ No modules.
 | <a name="input_access_logs_prefix"></a> [access\_logs\_prefix](#input\_access\_logs\_prefix) | n/a | `string` | `"nerves-hub-www-alb"` | no |
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | n/a | `any` | n/a | yes |
 | <a name="input_app_bucket"></a> [app\_bucket](#input\_app\_bucket) | n/a | `any` | n/a | yes |
+| <a name="input_app_name"></a> [app\_name](#input\_app\_name) | n/a | `string` | n/a | yes |
 | <a name="input_ca_bucket"></a> [ca\_bucket](#input\_ca\_bucket) | n/a | `any` | n/a | yes |
 | <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | n/a | `any` | n/a | yes |
 | <a name="input_cluster"></a> [cluster](#input\_cluster) | n/a | `any` | n/a | yes |
+| <a name="input_datadog_image"></a> [datadog\_image](#input\_datadog\_image) | Datadog container image | `string` | n/a | yes |
+| <a name="input_datadog_key_arn"></a> [datadog\_key\_arn](#input\_datadog\_key\_arn) | Datadog Key | `string` | n/a | yes |
 | <a name="input_db"></a> [db](#input\_db) | n/a | `any` | n/a | yes |
 | <a name="input_docker_image"></a> [docker\_image](#input\_docker\_image) | n/a | `any` | n/a | yes |
+| <a name="input_docker_image_tag"></a> [docker\_image\_tag](#input\_docker\_image\_tag) | Docker Image Tag of WWW Application | `string` | n/a | yes |
+| <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | n/a | `string` | n/a | yes |
 | <a name="input_erl_cookie"></a> [erl\_cookie](#input\_erl\_cookie) | n/a | `any` | n/a | yes |
 | <a name="input_from_email"></a> [from\_email](#input\_from\_email) | n/a | `string` | `"no-reply@nerves-hub.org"` | no |
 | <a name="input_host_name"></a> [host\_name](#input\_host\_name) | n/a | `any` | n/a | yes |

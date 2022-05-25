@@ -1,5 +1,15 @@
 # nerves_hub_www
 
+locals {
+  app_name = "nerves_hub_www"
+
+  ecs_shared_env_vars = <<EOF
+    { "name" : "ENVIRONMENT", "value" : "${terraform.workspace}" },
+    { "name" : "APP_NAME", "value" : "${local.app_name}" }
+EOF
+
+}
+
 resource "random_integer" "target_group_id" {
   min = 1
   max = 999
@@ -262,7 +272,7 @@ data "aws_iam_policy_document" "www_iam_policy" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.region}:${var.account_id}:parameter/nerves_hub_www/${terraform.workspace}*"
+      "arn:aws:ssm:${var.region}:${var.account_id}:parameter/nerves_hub_www/${terraform.workspace}*",
     ]
   }
 
@@ -388,6 +398,8 @@ resource "aws_ecs_task_definition" "www_task_definition" {
 
   container_definitions = <<DEFINITION
    [
+     ${module.logging_configs.fire_lens_container},
+     ${module.logging_configs.datadog_container},
      {
        "portMappings": [
          {
@@ -407,27 +419,16 @@ resource "aws_ecs_task_definition" "www_task_definition" {
        "privileged": false,
        "name": "nerves_hub_www",
        "environment": [
-         {
-           "name": "ENVIRONMENT",
-           "value": "${terraform.workspace}"
-         },
-         {
-           "name": "APP_NAME",
-           "value": "nerves_hub_www"
-         }
+         ${local.ecs_shared_env_vars}
        ],
-       "logConfiguration": {
-         "logDriver": "awslogs",
-         "options": {
-           "awslogs-region": "${var.region}",
-           "awslogs-group": "${var.cluster.log_group_name}",
-           "awslogs-stream-prefix": "nerves_hub_www"
-         }
-       }
+       ${module.logging_configs.log_configuration}
      }
    ]
-
 DEFINITION
+
+  depends_on = [
+    module.logging_configs
+  ]
 
 }
 
@@ -471,4 +472,17 @@ resource "aws_ecs_service" "www_ecs_service" {
     aws_iam_role.www_task_role,
     aws_lb_listener.www_lb_listener
   ]
+}
+
+module "logging_configs" {
+  source           = "../logging_configs"
+  app_name         = local.app_name
+  environment_name = terraform.workspace
+  task_name        = local.app_name
+  datadog_image    = var.datadog_image
+  datadog_key_arn  = var.datadog_key_arn
+  region           = var.region
+  docker_image_tag = var.docker_image_tag
+
+  tags = var.tags
 }
