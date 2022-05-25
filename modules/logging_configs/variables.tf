@@ -1,7 +1,3 @@
-variable "environment_name" {
-  type = string
-}
-
 variable "app_name" {
   type = string
 }
@@ -34,5 +30,5 @@ variable "datadog_key_arn" {
 
 variable "docker_image_tag" {
   description = "Docker Image Tag of Application"
-  type        = string  
+  type        = string
 }

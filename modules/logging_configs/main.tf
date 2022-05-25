@@ -22,7 +22,7 @@ locals {
     },
     "memoryReservation": 50,
     "dockerLabels": {
-      "com.datadoghq.tags.env": "${var.environment_name}",
+      "com.datadoghq.tags.env": "${terraform.workspace}",
       "com.datadoghq.tags.service": "${var.app_name}",
       "com.datadoghq.tags.version": "${var.docker_image_tag}"
     }
@@ -101,7 +101,7 @@ EOF
     },
     {
       "name": "DD_ENV",
-      "value": "${var.environment_name}"
+      "value": "${terraform.workspace}"
     },
     {
       "name": "DD_SERVICE",
@@ -117,7 +117,7 @@ EOF
     },
     {
       "name": "DD_DOGSTATSD_TAGS",
-      "value": "[\"env:${var.environment_name}\", \"service:${var.app_name}\", \"version:${var.docker_image_tag}\"]"
+      "value": "[\"env:${terraform.workspace}\", \"service:${var.app_name}\", \"version:${var.docker_image_tag}\"]"
     }
   ],
   "secrets": [
@@ -127,7 +127,7 @@ EOF
     }
   ],
   "dockerLabels": {
-          "com.datadoghq.tags.env": "${var.environment_name}",
+          "com.datadoghq.tags.env": "${terraform.workspace}",
           "com.datadoghq.tags.service": "${var.app_name}",
           "com.datadoghq.tags.version": "${var.docker_image_tag}"
   },
@@ -145,7 +145,7 @@ EOF
           "dd_service": "${var.app_name}",
           "dd_source": "elixir",
           "dd_message_key": "log",
-          "dd_tags": "env:${var.environment_name},application:${var.app_name}-${var.environment_name},version:${var.docker_image_tag},task:${var.task_name}",
+          "dd_tags": "env:${terraform.workspace},application:${var.app_name}-${terraform.workspace},version:${var.docker_image_tag},task:${var.task_name}",
           "TLS": "on",
           "provider": "ecs"
         },
@@ -157,7 +157,7 @@ EOF
       ]
     },
         "dockerLabels": {
-          "com.datadoghq.tags.env": "${var.environment_name}",
+          "com.datadoghq.tags.env": "${terraform.workspace}",
           "com.datadoghq.tags.service": "${var.app_name}",
           "com.datadoghq.tags.version": "${var.docker_image_tag}"
         }
@@ -173,7 +173,7 @@ EOF
           "dd_service": "${var.app_name}",
           "dd_source": "datadog",
           "dd_message_key": "log",
-          "dd_tags": "env:${var.environment_name},application:${var.app_name}-${var.environment_name},version:${var.docker_image_tag},task:${var.task_name}",
+          "dd_tags": "env:${terraform.workspace},application:${var.app_name}-${terraform.workspace},version:${var.docker_image_tag},task:${var.task_name}",
           "TLS": "on",
           "provider": "ecs"
         },
@@ -185,7 +185,7 @@ EOF
       ]
     },
         "dockerLabels": {
-          "com.datadoghq.tags.env": "${var.environment_name}",
+          "com.datadoghq.tags.env": "${terraform.workspace}",
           "com.datadoghq.tags.service": "${var.app_name}",
           "com.datadoghq.tags.version": "${var.docker_image_tag}"
         }
