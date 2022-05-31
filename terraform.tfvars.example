@@ -10,6 +10,7 @@ profile = "nerves-hub"
 ##
 
 bucket = "nerves-hub-terraform-state"
+#bucket_prefix = "abc"
 dynamodb_table = "terraform-state-lock"
 key = "terraform.tfstate"
 
