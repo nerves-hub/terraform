@@ -46,7 +46,7 @@ resource "aws_security_group" "rds_security_group" {
 
 resource "aws_db_instance" "default" {
   identifier                 = var.identifier
-  name                       = var.name
+  db_name                    = var.name
   publicly_accessible        = false
   apply_immediately          = true
   storage_encrypted          = true
