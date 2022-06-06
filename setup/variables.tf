@@ -39,7 +39,7 @@ variable "db_instance_class" {
 }
 variable "db_engine_version" {
   description = "The Engine version of the Postgres database server"
-  default     = "11.4"
+  default     = "12"
 }
 
 variable "bucket_prefix" {
