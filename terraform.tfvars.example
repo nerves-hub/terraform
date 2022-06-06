@@ -27,7 +27,7 @@ db_username = "nerveshub"
 db_password = "123456"
 #db_allocated_storage = 20
 #db_instance_class = "db.t2.small"
-db_engine_version = "12.10"
+#db_engine_version = "11.4"
 
 ##
 ## Logging and debugging

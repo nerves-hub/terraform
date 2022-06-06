@@ -4,7 +4,7 @@ locals {
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  version = ">= 2.4.0, < 3.0.0"
+  version = "~2.4"
 
   name = "nerves-hub-${terraform.workspace}"
 
