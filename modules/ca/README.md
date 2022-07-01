@@ -61,7 +61,6 @@
 | <a name="input_host_name"></a> [host\_name](#input\_host\_name) | n/a | `any` | n/a | yes |
 | <a name="input_kms_key"></a> [kms\_key](#input\_kms\_key) | n/a | `any` | n/a | yes |
 | <a name="input_local_dns_namespace"></a> [local\_dns\_namespace](#input\_local\_dns\_namespace) | n/a | `any` | n/a | yes |
-| <a name="input_log_group"></a> [log\_group](#input\_log\_group) | n/a | `any` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | n/a | `any` | n/a | yes |
 | <a name="input_s3_access_log_bucket"></a> [s3\_access\_log\_bucket](#input\_s3\_access\_log\_bucket) | What bucket to write access logs to | `string` | `""` | no |
 | <a name="input_s3_prefix"></a> [s3\_prefix](#input\_s3\_prefix) | S3 bucket name prefix | `string` | `""` | no |

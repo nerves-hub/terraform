@@ -86,11 +86,6 @@ variable "manage_default_vpc" {
   default = false
 }
 
-variable "default_vpc_name" {
-  type    = string
-  default = ""
-}
-
 variable "default_vpc_enable_dns_hostnames" {
   type    = bool
   default = false

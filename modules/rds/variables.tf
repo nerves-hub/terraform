@@ -76,14 +76,6 @@ variable "copy_tags_to_snapshot" {
   default = false
 }
 
-variable "option_group_name" {
-  default = ""
-}
-
-variable "parameter_group_name" {
-  default = ""
-}
-
 variable "cloudwatch_log_exports" {
   default = []
 }

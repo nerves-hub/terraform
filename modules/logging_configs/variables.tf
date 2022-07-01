@@ -15,14 +15,6 @@ variable "region" {
   description = "The AWS Region"
 }
 
-variable "tags" {
-  description = "A mapping of tags to assign to the resources"
-  type        = map(string)
-  default = {
-    terraform = true
-  }
-}
-
 variable "datadog_key_arn" {
   description = "Datadog Key ARN"
   type        = string

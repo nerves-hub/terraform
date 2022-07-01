@@ -49,9 +49,7 @@ No modules.
 | <a name="input_monitoring_role_arn"></a> [monitoring\_role\_arn](#input\_monitoring\_role\_arn) | n/a | `string` | `null` | no |
 | <a name="input_multi_az"></a> [multi\_az](#input\_multi\_az) | n/a | `bool` | `false` | no |
 | <a name="input_name"></a> [name](#input\_name) | n/a | `any` | n/a | yes |
-| <a name="input_option_group_name"></a> [option\_group\_name](#input\_option\_group\_name) | n/a | `string` | `""` | no |
 | <a name="input_options"></a> [options](#input\_options) | n/a | `list` | `[]` | no |
-| <a name="input_parameter_group_name"></a> [parameter\_group\_name](#input\_parameter\_group\_name) | n/a | `string` | `""` | no |
 | <a name="input_parameters"></a> [parameters](#input\_parameters) | n/a | `list` | `[]` | no |
 | <a name="input_password"></a> [password](#input\_password) | n/a | `any` | n/a | yes |
 | <a name="input_performance_insights"></a> [performance\_insights](#input\_performance\_insights) | n/a | `bool` | `false` | no |

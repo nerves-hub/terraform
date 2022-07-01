@@ -482,6 +482,4 @@ module "logging_configs" {
   datadog_key_arn  = var.datadog_key_arn
   region           = var.region
   docker_image_tag = var.docker_image_tag
-
-  tags = var.tags
 }

@@ -36,7 +36,7 @@ No modules.
 | <a name="input_bucket"></a> [bucket](#input\_bucket) | n/a | `any` | n/a | yes |
 | <a name="input_dynamodb_table"></a> [dynamodb\_table](#input\_dynamodb\_table) | n/a | `any` | n/a | yes |
 | <a name="input_key"></a> [key](#input\_key) | n/a | `any` | n/a | yes |
-| <a name="input_operators"></a> [operators](#input\_operators) | n/a | `list` | n/a | yes |
+| <a name="input_operators"></a> [operators](#input\_operators) | n/a | `list(string)` | n/a | yes |
 | <a name="input_s3_access_log_bucket"></a> [s3\_access\_log\_bucket](#input\_s3\_access\_log\_bucket) | What bucket to write access logs to | `string` | `""` | no |
 | <a name="input_s3_prefix"></a> [s3\_prefix](#input\_s3\_prefix) | S3 bucket name prefix | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resources | `map(string)` | <pre>{<br>  "terraform": true<br>}</pre> | no |

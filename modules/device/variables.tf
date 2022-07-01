@@ -5,13 +5,11 @@ variable "vpc" {}
 variable "task_security_group_id" {}
 variable "host_name" {}
 variable "db" {}
-variable "log_group" {}
 variable "docker_image" {}
 variable "erl_cookie" {}
 variable "app_bucket" {}
 variable "log_bucket" {}
 variable "ca_bucket" {}
-variable "ca_host" {}
 variable "cluster" {}
 variable "secret_key_base" {}
 variable "smtp_username" {}

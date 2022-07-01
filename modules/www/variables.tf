@@ -6,7 +6,6 @@ variable "lb_security_group_id" {}
 variable "task_security_group_id" {}
 variable "host_name" {}
 variable "db" {}
-variable "log_group" {}
 variable "docker_image" {}
 variable "live_view_signing_salt" {}
 variable "erl_cookie" {}
@@ -48,10 +47,6 @@ variable "tags" {
   default = {
     terraform = true
   }
-}
-
-variable "app_name" {
-  type = string
 }
 
 variable "datadog_image" {

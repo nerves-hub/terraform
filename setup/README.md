@@ -54,7 +54,7 @@
 | <a name="input_erl_cookie"></a> [erl\_cookie](#input\_erl\_cookie) | The Erlang distribution cookie value | `any` | n/a | yes |
 | <a name="input_key"></a> [key](#input\_key) | Key for Terraform state at S3 bucket | `any` | n/a | yes |
 | <a name="input_log_retention"></a> [log\_retention](#input\_log\_retention) | Cloud watch log retention days | `number` | `90` | no |
-| <a name="input_operators"></a> [operators](#input\_operators) | n/a | `list` | n/a | yes |
+| <a name="input_operators"></a> [operators](#input\_operators) | n/a | `list(string)` | n/a | yes |
 | <a name="input_profile"></a> [profile](#input\_profile) | AWS profile | `any` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region | `any` | n/a | yes |
 | <a name="input_web_db_name"></a> [web\_db\_name](#input\_web\_db\_name) | The name of the web database | `string` | `"nerves_hub_web"` | no |

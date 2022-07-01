@@ -37,7 +37,6 @@ No modules.
 | <a name="input_device_lb"></a> [device\_lb](#input\_device\_lb) | n/a | `any` | n/a | yes |
 | <a name="input_dns_zone"></a> [dns\_zone](#input\_dns\_zone) | n/a | `any` | n/a | yes |
 | <a name="input_is_api_alb"></a> [is\_api\_alb](#input\_is\_api\_alb) | Whether or not the api has an application load balancer | `bool` | `false` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resources | `map(string)` | <pre>{<br>  "terraform": true<br>}</pre> | no |
 | <a name="input_www_dns_record_name"></a> [www\_dns\_record\_name](#input\_www\_dns\_record\_name) | n/a | `any` | n/a | yes |
 | <a name="input_www_lb"></a> [www\_lb](#input\_www\_lb) | n/a | `any` | n/a | yes |
 

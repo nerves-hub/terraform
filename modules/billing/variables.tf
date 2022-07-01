@@ -5,7 +5,6 @@ variable "vpc" {}
 variable "cluster" {}
 variable "db" {}
 variable "kms_key" {}
-variable "bucket_prefix" {}
 variable "ca_bucket" {}
 variable "app_bucket" {}
 variable "docker_image" {}

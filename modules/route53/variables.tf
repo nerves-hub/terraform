@@ -9,11 +9,3 @@ variable "is_api_alb" {
   description = "Whether or not the api has an application load balancer"
   default     = false
 }
-
-variable "tags" {
-  description = "A mapping of tags to assign to the resources"
-  type        = map(string)
-  default = {
-    terraform = true
-  }
-}

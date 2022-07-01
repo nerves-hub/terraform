@@ -7,7 +7,6 @@ variable "db" {}
 variable "kms_key" {}
 variable "bucket_prefix" {}
 variable "docker_image" {}
-variable "log_group" {}
 variable "service_count" {}
 variable "task_execution_role" {}
 variable "erl_cookie" {}

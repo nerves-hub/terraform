@@ -412,8 +412,6 @@ module "logging_configs" {
   docker_image_tag = var.docker_image_tag
   datadog_key_arn  = var.datadog_key_arn
   region           = var.region
-
-  tags = var.tags
 }
 
 resource "aws_ecs_service" "device_ecs_service" {
