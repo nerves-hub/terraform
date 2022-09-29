@@ -21,6 +21,16 @@ variable "service_count" {
 variable "api_public_service_count" {
   default = 0
 }
+variable "cpu" {
+  type        = string
+  description = "CPU resource allocation"
+  default     = "256"
+}
+variable "memory" {
+  type        = string
+  description = "Memory resource allocation"
+  default     = "512"
+}
 variable "task_execution_role" {}
 variable "allow_list_ipv4" {
   default = []

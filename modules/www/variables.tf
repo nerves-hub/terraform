@@ -19,6 +19,16 @@ variable "smtp_password" {}
 variable "service_count" {}
 variable "task_execution_role" {}
 variable "certificate_arn" {}
+variable "cpu" {
+  type        = string
+  description = "CPU resource allocation"
+  default     = "256"
+}
+variable "memory" {
+  type        = string
+  description = "Memory resource allocation"
+  default     = "512"
+}
 
 variable "from_email" {
   default = "no-reply@nerves-hub.org"

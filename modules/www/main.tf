@@ -5,7 +5,8 @@ locals {
 
   ecs_shared_env_vars = <<EOF
     { "name" : "ENVIRONMENT", "value" : "${terraform.workspace}" },
-    { "name" : "APP_NAME", "value" : "${local.app_name}" }
+    { "name" : "APP_NAME", "value" : "${local.app_name}" },
+    { "name" : "DD_ENV", "value" : "${terraform.workspace}" }
 EOF
 
 }
@@ -392,8 +393,8 @@ resource "aws_ecs_task_definition" "www_task_definition" {
 
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = var.cpu
+  memory                   = var.memory
   tags                     = var.tags
 
   container_definitions = <<DEFINITION

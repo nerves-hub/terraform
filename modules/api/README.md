@@ -77,6 +77,7 @@
 | <a name="input_ca_host"></a> [ca\_host](#input\_ca\_host) | n/a | `any` | n/a | yes |
 | <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | n/a | `string` | `""` | no |
 | <a name="input_cluster"></a> [cluster](#input\_cluster) | n/a | `any` | n/a | yes |
+| <a name="input_cpu"></a> [cpu](#input\_cpu) | CPU resource allocation | `string` | `"256"` | no |
 | <a name="input_datadog_image"></a> [datadog\_image](#input\_datadog\_image) | Datadog container image | `string` | n/a | yes |
 | <a name="input_datadog_key_arn"></a> [datadog\_key\_arn](#input\_datadog\_key\_arn) | Datadog Key | `string` | n/a | yes |
 | <a name="input_db"></a> [db](#input\_db) | n/a | `any` | n/a | yes |
@@ -89,6 +90,7 @@
 | <a name="input_internal_lb"></a> [internal\_lb](#input\_internal\_lb) | Whether or not the load balancer is internal | `bool` | `false` | no |
 | <a name="input_kms_key"></a> [kms\_key](#input\_kms\_key) | n/a | `any` | n/a | yes |
 | <a name="input_log_bucket"></a> [log\_bucket](#input\_log\_bucket) | n/a | `any` | n/a | yes |
+| <a name="input_memory"></a> [memory](#input\_memory) | Memory resource allocation | `string` | `"512"` | no |
 | <a name="input_nlb"></a> [nlb](#input\_nlb) | n/a | `bool` | `true` | no |
 | <a name="input_region"></a> [region](#input\_region) | n/a | `any` | n/a | yes |
 | <a name="input_secret_key_base"></a> [secret\_key\_base](#input\_secret\_key\_base) | n/a | `any` | n/a | yes |

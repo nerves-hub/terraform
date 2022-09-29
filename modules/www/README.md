@@ -66,6 +66,7 @@
 | <a name="input_ca_bucket"></a> [ca\_bucket](#input\_ca\_bucket) | n/a | `any` | n/a | yes |
 | <a name="input_certificate_arn"></a> [certificate\_arn](#input\_certificate\_arn) | n/a | `any` | n/a | yes |
 | <a name="input_cluster"></a> [cluster](#input\_cluster) | n/a | `any` | n/a | yes |
+| <a name="input_cpu"></a> [cpu](#input\_cpu) | CPU resource allocation | `string` | `"256"` | no |
 | <a name="input_datadog_image"></a> [datadog\_image](#input\_datadog\_image) | Datadog container image | `string` | n/a | yes |
 | <a name="input_datadog_key_arn"></a> [datadog\_key\_arn](#input\_datadog\_key\_arn) | Datadog Key | `string` | n/a | yes |
 | <a name="input_db"></a> [db](#input\_db) | n/a | `any` | n/a | yes |
@@ -79,6 +80,7 @@
 | <a name="input_lb_security_group_id"></a> [lb\_security\_group\_id](#input\_lb\_security\_group\_id) | n/a | `any` | n/a | yes |
 | <a name="input_live_view_signing_salt"></a> [live\_view\_signing\_salt](#input\_live\_view\_signing\_salt) | n/a | `any` | n/a | yes |
 | <a name="input_log_bucket"></a> [log\_bucket](#input\_log\_bucket) | n/a | `any` | n/a | yes |
+| <a name="input_memory"></a> [memory](#input\_memory) | Memory resource allocation | `string` | `"512"` | no |
 | <a name="input_region"></a> [region](#input\_region) | n/a | `any` | n/a | yes |
 | <a name="input_secret_key_base"></a> [secret\_key\_base](#input\_secret\_key\_base) | n/a | `any` | n/a | yes |
 | <a name="input_service_count"></a> [service\_count](#input\_service\_count) | n/a | `any` | n/a | yes |
