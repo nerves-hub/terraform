@@ -184,14 +184,14 @@ resource "aws_ssm_parameter" "nerves_hub_www_ssm_ses_server" {
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_smtp_username" {
   name      = "/nerves_hub_www/${terraform.workspace}/SMTP_USERNAME"
   type      = "SecureString"
-  value     = var.smtp_password
+  value     = var.smtp_username
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "nerves_hub_www_ssm_secret_smtp_password" {
   name      = "/nerves_hub_www/${terraform.workspace}/SMTP_PASSWORD"
   type      = "SecureString"
-  value     = var.smtp_username
+  value     = var.smtp_password
   overwrite = true
 }
 

@@ -159,14 +159,14 @@ resource "aws_ssm_parameter" "nerves_hub_device_ssm_ses_server" {
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_smtp_username" {
   name      = "/${local.device_app_name}/${terraform.workspace}/SMTP_USERNAME"
   type      = "SecureString"
-  value     = var.smtp_password
+  value     = var.smtp_username
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "nerves_hub_device_ssm_secret_smtp_password" {
   name      = "/${local.device_app_name}/${terraform.workspace}/SMTP_PASSWORD"
   type      = "SecureString"
-  value     = var.smtp_username
+  value     = var.smtp_password
   overwrite = true
 }
 
