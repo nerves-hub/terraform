@@ -6,7 +6,7 @@ locals {
   fire_lens_container = <<EOF
   {
     "essential": true,
-    "image": "906394416424.dkr.ecr.${var.region}.amazonaws.com/aws-for-fluent-bit:stable",
+    "image": "514496004130.dkr.ecr.${var.region}.amazonaws.com/fluentbit-custom-eng:1.0.0",
     "name": "log_router",
     "cpu": 0,
     "user": "0",
@@ -17,7 +17,9 @@ locals {
     "firelensConfiguration": {
       "type": "fluentbit",
       "options": {
-        "enable-ecs-log-metadata": "true"
+        "enable-ecs-log-metadata": "true",
+        "config-file-type": "file",
+        "config-file-value": "/custom.conf"
       }
     },
     "memoryReservation": 50,
