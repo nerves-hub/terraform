@@ -433,6 +433,54 @@ DEFINITION
 
 }
 
+resource "aws_ecs_task_definition" "www_exec_task_definition" {
+  family             = "nerves-hub-${terraform.workspace}-www-exec"
+  task_role_arn      = aws_iam_role.www_task_role.arn
+  execution_role_arn = var.task_execution_role.arn
+
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.cpu
+  memory                   = var.memory
+  tags                     = var.tags
+
+  container_definitions = <<DEFINITION
+   [
+     ${module.logging_configs.fire_lens_container},
+     ${module.logging_configs.datadog_container},
+     {
+       "portMappings": [
+         {
+           "hostPort": 80,
+           "protocol": "tcp",
+           "containerPort": 80
+         },
+         {
+           "hostPort": 4369,
+           "protocol": "tcp",
+           "containerPort": 4369
+         }
+       ],
+       "networkMode": "awsvpc",
+       "image": "${var.docker_image}",
+       "essential": true,
+       "privileged": false,
+       "name": "exec",
+       "entryPoint": ["tail"]
+       "command":["-f", "/dev/null"]
+       "environment": [
+         ${local.ecs_shared_env_vars}
+       ],
+       ${module.logging_configs.log_configuration}
+     }
+   ]
+DEFINITION
+
+  depends_on = [
+    module.logging_configs
+  ]
+}
+
 resource "aws_ecs_service" "www_ecs_service" {
   name    = "nerves-hub-www"
   cluster = var.cluster.arn
